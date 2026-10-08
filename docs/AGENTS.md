@@ -30,5 +30,6 @@ This file is the project-specific development guide. The four design documents i
 - Tenant-aware repositories must require tenant context and apply it to the actual MongoDB query/update filter. Review indexes and unique constraints against the database design.
 - Do not add a dependency without a concrete feature need. Prefer the simplest approach that satisfies the approved design.
 - Before substantial implementation, state the approach and affected modules. Discuss architecture changes and unresolved conflicts before implementing them.
+- Keep [`BUILD_TRACKER.md`](BUILD_TRACKER.md) current as work is completed. Distinguish UI previews from implemented features, and update this guide and the root `AGENTS.md` when the user approves lasting product, architecture, or workflow decisions.
 - Use the existing package scripts for lint, formatting, type checking, and build validation when requested or appropriate. Add/run tests when the user requests them or the task explicitly requires test verification.
 - Never commit or push unless the user explicitly asks.

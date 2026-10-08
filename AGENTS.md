@@ -37,6 +37,7 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 ## Change and verification rules
 
 - Before a substantial feature, state the approach and affected modules; keep responsibilities aligned with the design documents.
+- Keep [`docs/BUILD_TRACKER.md`](docs/BUILD_TRACKER.md) current as work is completed. Mark UI previews separately from implemented features, and update the root and `docs/AGENTS.md` instructions when the user approves lasting product, architecture, or workflow decisions.
 - Add only dependencies needed for the approved feature. Avoid speculative infrastructure and duplicated domain logic.
 - Do not commit or push unless the user explicitly requests it.
 - Follow the repository scripts for linting, type checking, formatting, and production builds when validation is requested or needed for the change. Add/run tests when requested or when the task explicitly requires test verification.
