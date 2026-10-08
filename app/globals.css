@@ -2,25 +2,25 @@
 
 :root {
   color-scheme: light;
-  --background: #fffdfd;
-  --foreground: #241b1d;
+  --background: #fdfbf7;
+  --foreground: #1c1a17;
   --card: #ffffff;
-  --card-foreground: #241b1d;
+  --card-foreground: #1c1a17;
   --popover: #ffffff;
-  --popover-foreground: #241b1d;
-  --secondary: #f5eef0;
-  --secondary-foreground: #35272b;
-  --muted: #f5f0f1;
-  --muted-foreground: #756d70;
-  --accent: #f5eef0;
-  --accent-foreground: #35272b;
-  --destructive: #c0394d;
-  --border: #e9e2e4;
-  --input: #e9e2e4;
-  --ring: #9f354f;
-  --primary: #9f354f;
+  --popover-foreground: #1c1a17;
+  --secondary: #f5f3ef;
+  --secondary-foreground: #2b2823;
+  --muted: #f5f3ef;
+  --muted-foreground: #78716c;
+  --accent: #f5eef3;
+  --accent-foreground: #6b2d5c;
+  --destructive: #ba1a1a;
+  --border: #e7e2da;
+  --input: #e7e2da;
+  --ring: #6b2d5c;
+  --primary: #6b2d5c;
   --primary-foreground: #ffffff;
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 }
 
 @theme inline {
@@ -52,5 +52,5 @@ body {
   min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
 }
