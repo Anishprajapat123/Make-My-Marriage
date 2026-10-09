@@ -289,6 +289,7 @@ The wedding becomes a shared workspace.
 Users must be able to:
 
 - Register
+- Verify email before signing in with a local email/password account.
 - Login
 - Logout
 - Reset password

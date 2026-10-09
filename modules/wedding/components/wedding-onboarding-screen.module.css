@@ -1,0 +1,465 @@
+.page {
+  min-height: 100vh;
+  padding: 0 48px 64px;
+  background: #fdfbf7;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  max-width: 1360px;
+  margin: 0 auto;
+  border-bottom: 1px solid #e7e2da;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #2b2823;
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.brandMark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #e7e2da;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b2d5c;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.78fr) minmax(0, 1.22fr);
+  align-items: start;
+  gap: clamp(44px, 8vw, 120px);
+  width: min(1100px, 100%);
+  margin: 92px auto 0;
+}
+
+.intro {
+  position: sticky;
+  top: 48px;
+  padding-top: 12px;
+}
+
+.introEyebrow,
+.stepCaption {
+  color: #78716c;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.intro h1,
+.pausedCard h1 {
+  margin: 20px 0 16px;
+  color: #2b2823;
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: clamp(38px, 4vw, 54px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.intro > p,
+.pausedCard > p {
+  max-width: 420px;
+  margin: 0;
+  color: #68615b;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.privacyNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 330px;
+  margin-top: 34px;
+  padding-top: 18px;
+  border-top: 1px solid #e7e2da;
+  color: #625e58;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.privacyNote svg {
+  flex: 0 0 auto;
+  color: #6b2d5c;
+}
+
+.formCard,
+.pausedCard {
+  border: 1px solid #e7e2da;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 1px 3px rgb(43 40 35 / 4%),
+    0 8px 24px -4px rgb(43 40 35 / 6%);
+}
+
+.formCard {
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #eee9e2;
+}
+
+.stepCaption {
+  font-size: 9px;
+}
+
+.cardHeader h2 {
+  margin: 8px 0 0;
+  color: #2b2823;
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 30px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+}
+
+.progress {
+  display: flex;
+  gap: 6px;
+}
+
+.progress span {
+  width: 24px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e7e2da;
+}
+
+.progress .progressActive {
+  background: #6b2d5c;
+}
+
+.form {
+  padding-top: 26px;
+}
+
+.coupleFields,
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field,
+.form {
+  min-width: 0;
+}
+
+.form > .field,
+.fieldGrid,
+.coupleFields {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #37312e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid #e7e2da;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #2b2823;
+  font: inherit;
+  font-size: 13px;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.field input::placeholder {
+  color: #a39b94;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #6b2d5c;
+  box-shadow: 0 0 0 3px #f2eaef;
+}
+
+.inputWithIcon {
+  position: relative;
+}
+
+.inputWithIcon svg {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  color: #78716c;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.inputWithIcon input {
+  padding-left: 39px;
+}
+
+.hint {
+  display: block;
+  margin-top: 6px;
+  color: #827a73;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.formMessage {
+  min-height: 24px;
+  color: #a32929;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.formMessage p {
+  margin: 0 0 12px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eee9e2;
+}
+
+.requiredNote {
+  color: #827a73;
+  font-size: 10px;
+}
+
+.primaryButton,
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+
+.primaryButton {
+  padding: 0 17px;
+  border: 1px solid #6b2d5c;
+  background: #6b2d5c;
+  color: #fff;
+}
+
+.primaryButton:hover:not(:disabled) {
+  border-color: #58244b;
+  background: #58244b;
+}
+
+.primaryButton:disabled,
+.backButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.primaryButton:focus-visible,
+.backButton:focus-visible {
+  outline: 3px solid #d9c6d4;
+  outline-offset: 2px;
+}
+
+.backButton {
+  padding: 0 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #625e58;
+}
+
+.backButton:hover:not(:disabled) {
+  background: #f5f3ef;
+}
+
+.reviewIntro {
+  margin: 0 0 20px;
+  color: #68615b;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.reviewList {
+  margin: 0;
+  border-top: 1px solid #eee9e2;
+}
+
+.reviewList > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) minmax(0, 1.3fr);
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee9e2;
+}
+
+.reviewList dt {
+  color: #827a73;
+  font-size: 11px;
+}
+
+.reviewList dd {
+  margin: 0;
+  color: #37312e;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.pausedCard {
+  width: min(540px, 100%);
+  margin: 110px auto 0;
+  padding: clamp(28px, 6vw, 48px);
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+
+  .content {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 38px;
+    margin-top: 64px;
+  }
+
+  .intro h1 {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding: 0 16px 36px;
+  }
+
+  .topbar {
+    min-height: 64px;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    margin-top: 36px;
+  }
+
+  .intro {
+    position: static;
+    padding-top: 0;
+  }
+
+  .intro h1,
+  .pausedCard h1 {
+    max-width: 430px;
+    margin: 12px 0 10px;
+    font-size: 38px;
+  }
+
+  .intro > p,
+  .pausedCard > p {
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .privacyNote {
+    display: none;
+  }
+
+  .formCard {
+    width: 100%;
+    padding: 22px 18px 20px;
+  }
+
+  .cardHeader h2 {
+    font-size: 26px;
+  }
+
+  .coupleFields,
+  .fieldGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .coupleFields,
+  .fieldGrid {
+    margin-bottom: 16px;
+  }
+
+  .form > .field {
+    margin-bottom: 16px;
+  }
+
+  .field input,
+  .field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .actions {
+    align-items: stretch;
+  }
+
+  .actions .primaryButton {
+    min-height: 46px;
+  }
+
+  .requiredNote {
+    max-width: 90px;
+    line-height: 1.4;
+  }
+
+  .reviewList > div {
+    grid-template-columns: minmax(92px, 0.7fr) minmax(0, 1.3fr);
+    gap: 10px;
+  }
+
+  .pausedCard {
+    margin-top: 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field input,
+  .field select,
+  .primaryButton,
+  .backButton {
+    transition: none;
+  }
+}

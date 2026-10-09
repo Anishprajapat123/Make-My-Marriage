@@ -15,7 +15,7 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 - `[x]` Initial Next.js App Router and TypeScript scaffold, shared configuration, modular-monolith folders, Docker foundation, and project instructions.
 - `[x]` Responsive dashboard UI preview for desktop and mobile, using clearly labeled sample content.
-- `[ ]` Dashboard connected to authentication, tenant-scoped data, and the dashboard API. Current names, counts, search results, notifications, and activity are sample-only; no changes are saved.
+- `[~]` Dashboard identity now comes from the authenticated wedding and member. Planning counts, search results, notifications, and activity remain explicitly labeled sample data; no planning changes are saved.
 - `[ ]` Production features and persistence. No business module should be treated as implemented solely because its folder or a dashboard preview exists.
 
 ## Recommended implementation sequence
@@ -26,8 +26,8 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 - `[x]` Application scaffold and approved folder structure.
 - `[x]` Tailwind, ESLint, TypeScript, Next.js, Docker, environment example, and README foundation.
-- `[ ]` Confirm local MongoDB Atlas connection configuration and required secrets in each environment.
-- `[ ]` Add shared database connection, error handling, logging, and validation foundations as the first feature needs them.
+- `[x]` Confirm local MongoDB Atlas connection configuration; the development connection was verified during account-flow testing. Configure and verify secrets independently in staging and production.
+- `[~]` Shared foundations include a server-only Mongoose connection, error-response helpers, Zod boundary validation, auth-token/user models, and SES email delivery. Logging and broader test conventions remain to be established.
 - `[ ]` Establish unit, integration, API, security, and E2E test conventions before relying on them for feature acceptance.
 
 ### 1. Dashboard UI preview
@@ -40,9 +40,10 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 ### 2. Account, authentication, and workspace access
 
-- `[ ]` Login, registration/onboarding, logout, password recovery, and profile UI.
-- `[ ]` Auth.js v5 foundation, session handling, and protected workspace routes.
-- `[ ]` Wedding creation/setup flow and the initial owner membership.
+- `[x]` Responsive login, registration, verification, and password-recovery screens connected to the account lifecycle APIs.
+- `[~]` Local account creation, email verification before sign-in, credentials login, password recovery/reset, and current-browser sign-out are implemented. Verify failure states, email delivery failures, and all flows with automated tests before treating the feature as complete.
+- `[~]` Auth.js v5 JWT sessions and a protected workspace shell are in place. Disabled users and sessions issued before password reset are rejected; verify sign-out and revocation behavior end to end.
+- `[~]` Responsive wedding setup and validated onboarding API create the wedding tenant, default system role templates, and initial owner membership in one MongoDB transaction. Verify transaction rollback, duplicate membership, and concurrent creation behavior before marking complete.
 - `[ ]` Resolve tenant context from the verified session and membership on the server.
 - `[ ]` Enforce one active or suspended wedding membership per account; retain removed history and allow a removed member to join or create another wedding.
 - `[ ]` Member management, member invitations/acceptance, custom roles, and permission checks.
@@ -83,6 +84,7 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 - `[ ]` Tenant-isolation tests for every tenant-owned module and cross-tenant resource access.
 - `[ ]` Permission/security tests for members, guests, vendors, expenses, invitation tokens, and uploads.
+- `[ ]` Configure strict AWS WAF rate limits for public authentication endpoints before production exposure.
 - `[ ]` API contract and error-response consistency; maintain OpenAPI alongside validated contracts as APIs are implemented.
 - `[ ]` E2E coverage for account setup, core planning, invitation/RSVP, gallery, and livestream journeys.
 - `[ ]` Validate expected guest-list and public-page loads against the design targets before release.
@@ -105,3 +107,8 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - Initial scaffold completed.
 - Responsive dashboard UI preview created; it currently uses sample data only.
 - Dashboard search now safely normalizes repeated query parameters; unfinished sidebar items do not navigate to placeholder content.
+- Local registration, email verification, credentials sign-in, forgot/reset password, Auth.js JWT sessions, protected workspace layout, and sign-out control added. Local MongoDB and SES integration were exercised manually; automated auth/security tests and production AWS WAF rate limits remain outstanding.
+- Auth tokens are stored as hashes with expiry; password resets increment a session version. Configure AWS WAF rate-based rules for public auth endpoints before production exposure.
+- Wedding onboarding UI and API added. Wedding, default system role templates, and the owner membership are created atomically; the dashboard shows the current wedding identity while keeping preview metrics labeled as sample data.
+- Family Member defaults no longer grant wedding-wide event, task, guest, or RSVP visibility. Current wedding resolution now combines permissions from all tenant-scoped roles assigned to a member.
+- Wedding description, couple/cover image, contact information, hashtag, and theme editing remain follow-up wedding profile work; only the fields in the onboarding API contract are collected in this slice.

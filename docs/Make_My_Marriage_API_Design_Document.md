@@ -342,6 +342,48 @@ Domain-specific codes should be added where they improve client behavior.
 
 # 8. Authentication APIs
 
+The Auth.js handler at `/api/auth/[...nextauth]` owns provider sign-in and
+sign-out. The following versioned routes handle account lifecycle operations.
+
+## 8.0 Register
+
+```http
+POST /api/v1/auth/register
+```
+
+Accepts a display name, email, and password. Validate the input, create a local
+account if eligible, and send a one-time verification link. Return `202` with a
+generic response regardless of account existence or mail delivery outcome.
+Local credentials cannot sign in before email verification.
+
+## 8.0.1 Verify email
+
+```http
+POST /api/v1/auth/verify-email
+```
+
+Accepts the raw one-time token from the verification link. Match its stored
+hash, enforce expiry, consume it, and mark the user's email verified.
+
+## 8.0.2 Request password reset
+
+```http
+POST /api/v1/auth/password/forgot
+```
+
+Accepts an email address and returns a generic `202` response whether or not an
+eligible account exists or email delivery succeeds.
+
+## 8.0.3 Reset password
+
+```http
+POST /api/v1/auth/password/reset
+```
+
+Accepts a one-time reset token and new password. Consume the hashed token,
+update the password hash, and increment the user's session version to invalidate
+existing sessions.
+
 ## 8.1 Get current session
 
 ```http
@@ -361,7 +403,8 @@ GET /api/v1/auth/session
     },
     "wedding": {
       "id": "wedding_123",
-      "role": "OWNER"
+      "roles": ["OWNER"],
+      "permissions": ["VIEW_WEDDING", "MANAGE_WEDDING"]
     }
   }
 }
@@ -389,9 +432,11 @@ POST /api/v1/auth/onboarding
 }
 ```
 
-The authenticated user becomes the initial wedding owner.
+The authenticated user becomes the initial wedding owner and receives the `OWNER` role.
 
 Onboarding must prevent a second wedding while the account has an active or suspended wedding membership. A user with only removed membership history may join or create another wedding.
+
+The request is validated against the required wedding title, couple names, wedding date, city, IANA timezone, and language (`en` or `hi`). The server derives the tenant and owner from the authenticated session; client-supplied tenant or owner identifiers are not accepted. Create the wedding, default system role templates, and the active owner membership assigned to the `OWNER` role in one MongoDB transaction. Return `201` with the created wedding summary, or `409 WEDDING_ALREADY_EXISTS` when the account already has an active or suspended membership.
 
 ## 8.3 Update profile
 
@@ -399,13 +444,9 @@ Onboarding must prevent a second wedding while the account has an active or susp
 PATCH /api/v1/auth/profile
 ```
 
-## 8.4 Logout
-
-```http
-POST /api/v1/auth/logout
-```
-
-The actual session provider may implement login/logout endpoints differently internally; these logical operations define the application contract.
+Sign-out uses Auth.js `POST /api/auth/signout`, which clears the current
+browser's Auth.js session cookie. Password resets and disabled accounts also
+invalidate existing JWT sessions through the session-version/status check.
 
 ---
 
@@ -2459,10 +2500,14 @@ They can be introduced later without changing the core API philosophy.
 
 ```text
 AUTH
+  POST   /auth/register
+  POST   /auth/verify-email
+  POST   /auth/password/forgot
+  POST   /auth/password/reset
   GET    /auth/session
   POST   /auth/onboarding
   PATCH  /auth/profile
-  POST   /auth/logout
+  POST   /api/auth/signout (Auth.js)
 
 WEDDING
   GET    /wedding

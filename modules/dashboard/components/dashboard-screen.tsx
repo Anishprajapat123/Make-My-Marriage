@@ -139,15 +139,26 @@ function PreviewLabel() {
   return (
     <span className={styles.previewLabel}>
       <Sparkles aria-hidden="true" size={13} />
-      Sample workspace
+      Sample planning data
     </span>
   );
 }
 
 export function DashboardScreen({
   searchQuery = "",
+  memberName,
+  wedding,
 }: {
   searchQuery?: string;
+  memberName: string;
+  wedding: {
+    title: string;
+    bride: { name: string };
+    groom: { name: string };
+    weddingDate: Date;
+    city: string;
+    timezone: string;
+  };
 }) {
   const cleanQuery = searchQuery.trim().slice(0, 100);
   const normalizedQuery = cleanQuery.toLocaleLowerCase();
@@ -158,6 +169,41 @@ export function DashboardScreen({
           .includes(normalizedQuery),
       )
     : [];
+  const todayLabel = new Intl.DateTimeFormat("en", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: wedding.timezone,
+  }).format(new Date());
+  const weddingDateLabel = new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(wedding.weddingDate);
+  const zonedTodayParts = new Intl.DateTimeFormat("en", {
+    calendar: "gregory",
+    numberingSystem: "latn",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: wedding.timezone,
+  })
+    .formatToParts(new Date())
+    .reduce<Record<string, string>>((parts, item) => {
+      parts[item.type] = item.value;
+      return parts;
+    }, {});
+  const todayYear = Number(zonedTodayParts.year);
+  const todayMonth = Number(zonedTodayParts.month);
+  const todayDay = Number(zonedTodayParts.day);
+  const weddingDayCount = Math.ceil(
+    (wedding.weddingDate.getTime() -
+      Date.UTC(todayYear, todayMonth - 1, todayDay)) /
+      86_400_000,
+  );
+  const firstName = memberName.trim().split(/\s+/)[0] || "there";
 
   return (
     <WorkspaceShell searchQuery={cleanQuery}>
@@ -166,18 +212,19 @@ export function DashboardScreen({
           <div className={styles.welcomeCopy}>
             <div className={styles.welcomeEyebrow}>
               <span className={styles.eyebrowLine} />
-              Thursday, October 8, 2026
+              {todayLabel}
               <PreviewLabel />
             </div>
             <h1>
-              Good morning, Anish<span>.</span>
+              Good morning, {firstName}
+              <span>.</span>
             </h1>
             <p>Here’s what’s happening with your wedding.</p>
           </div>
           <div className={styles.headerActions}>
             <span className={styles.weddingDate}>
               <CalendarDays aria-hidden="true" size={15} />
-              <span>18 October 2026</span>
+              <span>{weddingDateLabel}</span>
             </span>
             <details className={styles.actionMenu}>
               <summary className={styles.primaryButton}>
@@ -230,22 +277,20 @@ export function DashboardScreen({
           id="dashboard-overview"
         >
           <div className={styles.couplePortrait} aria-hidden="true">
-            <span>A</span>
+            <span>{wedding.bride.name.slice(0, 1).toUpperCase()}</span>
             <i>&</i>
-            <span>P</span>
+            <span>{wedding.groom.name.slice(0, 1).toUpperCase()}</span>
           </div>
           <div className={styles.weddingIdentity}>
             <span className={styles.cardEyebrow}>THE CELEBRATION OF</span>
-            <h2>
-              Anish <span>&</span> Priya
-            </h2>
+            <h2>{wedding.title}</h2>
             <p>
-              Jaipur, Rajasthan <span>·</span> 18 October 2026
+              {wedding.city} <span>·</span> {weddingDateLabel}
             </p>
           </div>
           <div className={styles.countdown}>
-            <strong>10</strong>
-            <span>days to go</span>
+            <strong>{Math.abs(weddingDayCount)}</strong>
+            <span>{weddingDayCount >= 0 ? "days to go" : "days since"}</span>
           </div>
           <div className={styles.bannerOrnament} aria-hidden="true">
             ✳

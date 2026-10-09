@@ -1,0 +1,48 @@
+.container {
+  width: 100%;
+}
+
+.button {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #746879;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.button:hover:not(:disabled) {
+  border-color: #f2dce3;
+  background: #fff6f8;
+  color: #963e5c;
+}
+
+.button:focus-visible {
+  outline: 3px solid #d77b9a;
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.error {
+  margin: 6px 12px 0;
+  color: #a52c3d;
+  font-size: 12px;
+  line-height: 1.45;
+}

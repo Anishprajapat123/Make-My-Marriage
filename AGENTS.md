@@ -21,6 +21,8 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Tenant, identity, and access rules
 
+- Local email/password accounts must verify their email address before they can sign in. Verification tokens are one-time, expiring, and stored only as hashes.
+
 - One wedding is one tenant. A user can have at most one `ACTIVE` or `SUSPENDED` wedding membership at a time. Preserve `REMOVED` membership history; a user with only removed memberships may later join or create a different wedding.
 - Every tenant-owned read and write must include the tenant scope in the database operation. Resolve tenant context on the server from a verified session and membership. Never authorize using a client-supplied `tenantId` alone.
 - A wedding can have multiple members. Authorization must verify both tenant membership and the relevant role/permission for each operation; do not rely only on hidden UI controls.

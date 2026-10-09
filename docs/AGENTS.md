@@ -5,6 +5,7 @@ This file is the project-specific development guide. The four design documents i
 ## Product and architecture
 
 - Build a free wedding planning and management product. Do not add billing, subscriptions, freemium tiers, or premium entitlements.
+- Local email/password accounts must verify their email address before sign-in. Keep registration and password-recovery responses generic so they do not disclose whether an address has an account.
 - Use the approved TypeScript, Next.js App Router, Node.js modular-monolith architecture with MongoDB Atlas/Mongoose and AWS S3. Do not introduce microservices, Kubernetes, Kafka/RabbitMQ, or Redis without an approved concrete requirement.
 - Keep the application modular: thin pages and Route Handlers in `app/`, domain behavior in `modules/`, cross-cutting infrastructure in `lib/`, and reusable shared UI in `components/`.
 - Do not implement fake production functionality or expand product scope without user approval.

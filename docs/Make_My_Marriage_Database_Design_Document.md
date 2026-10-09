@@ -124,6 +124,7 @@ No MongoDB TTL indexes are used for wedding data. Wedding data remains available
 | Collection | Scope | Purpose | Main parent / relation |
 |---|---|---|---|
 | `users` | Global | Login identity and profile | User account |
+| `auth_tokens` | Global | Hashed, expiring email-verification and password-reset tokens | `users` |
 | `weddings` | Tenant root | Wedding workspace and tenant root | Self |
 | `wedding_members` | Tenant | Maps users to one wedding and their roles | `users`, `weddings` |
 | `member_invitations` | Tenant | Pending invitations for people who may not have accounts yet | `weddings`, `wedding_members` |
@@ -235,6 +236,7 @@ Global authentication identities. This collection is not tenant-scoped because t
 | `avatarUrl` | string/null | No | Optional external avatar |
 | `phone` | string/null | No | Optional profile data; not used for OTP |
 | `status` | enum | Yes | `ACTIVE`, `DISABLED` |
+| `sessionVersion` | number | Yes | Incremented to invalidate existing JWT sessions after password reset |
 | `createdAt` | Date | Yes | Audit |
 | `updatedAt` | Date | Yes | Audit |
 
@@ -246,6 +248,23 @@ UNIQUE (sparse): { authProvider: 1, googleSubject: 1 }
 ```
 
 `phone` is not a login key in V1.
+
+## `auth_tokens` Collection
+
+Global, short-lived credentials for account verification and password resets.
+Store only a SHA-256 hash of each random token. Each user has at most one
+current token per purpose; tokens expire and are single-use.
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `userId` | ObjectId | Yes | References `users` |
+| `purpose` | enum | Yes | `EMAIL_VERIFICATION`, `PASSWORD_RESET` |
+| `tokenHash` | string | Yes | Unique hash; raw token is only sent to the user |
+| `expiresAt` | Date | Yes | TTL expiration |
+| `createdAt` | Date | Yes | Token issue time |
+
+Indexes: unique `{ userId: 1, purpose: 1 }`, unique `{ tokenHash: 1 }`, and TTL
+`{ expiresAt: 1 }` with `expireAfterSeconds: 0`.
 
 ---
 

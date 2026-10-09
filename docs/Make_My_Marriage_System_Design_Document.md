@@ -386,6 +386,8 @@ config/</th>
 
 - Forgot/reset password flow via transactional email.
 
+- Local email/password registration requires email verification before sign-in. Verification and password-reset tokens are high-entropy, single-use values; persist only their hashes and enforce expiry.
+
 - No phone/OTP authentication in V1.
 
 - Guests have no accounts.
@@ -395,9 +397,12 @@ config/</th>
 ## 7.2 Session design
 
 Use Auth.js with a secure session cookie. Keep only stable identity
-claims in the session. Do not permanently embed mutable permissions in
-the client token. For sensitive actions, the server resolves the current
-membership and permissions from MongoDB before mutation.
+claims and a session-version marker in the JWT; do not permanently embed
+mutable permissions in the client token. Password reset increments the
+user's session version, and disabled accounts must no longer resolve to an
+active session. For sensitive actions, the server resolves the current
+membership and permissions from MongoDB before mutation. Configure trusted
+host handling only behind a host-filtering production ingress.
 
 ## 7.3 RBAC and custom permissions
 

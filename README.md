@@ -1,11 +1,13 @@
 # Make My Marriage
 
-Next.js modular-monolith scaffold for the Make My Marriage project.
-
-This repository currently contains application structure and tooling only. It
-does not implement authentication, wedding workflows, tenant access, database
-models, or file uploads. The empty module folders reserve the approved domain
-boundaries. `docs/AGENTS.md` contains the project development rules.
+Next.js modular-monolith application for the Make My Marriage project. The
+current implementation includes the responsive dashboard preview and an
+initial account-authentication foundation: local registration with email
+verification, credentials sign-in, password recovery, Auth.js sessions, and a
+protected workspace shell. Wedding onboarding creates the wedding tenant,
+default role templates, and initial owner membership transactionally. The dashboard still
+shows sample planning metrics; tenant-aware planning modules and broader
+membership/permission management are not implemented yet.
 
 ## Architecture boundaries
 
@@ -24,9 +26,17 @@ boundaries. `docs/AGENTS.md` contains the project development rules.
 ## Local development
 
 1. Install the locked dependencies with `npm ci`.
-2. Copy `.env.example` to `.env.local` and add local values when implementing
-   integrations. The scaffold itself does not require secrets to start.
-3. Start the development server with `npm run dev` and open
+2. Copy `.env.example` to `.env.local` and configure `MONGODB_URI`,
+   `APP_BASE_URL`, `AUTH_SECRET`, `AWS_REGION`, and `SES_FROM_EMAIL` for account
+   flows. The development machine also needs AWS credentials authorized to send
+   through SES. Set `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET` only when enabling
+   Google sign-in. Never commit `.env.local` or credentials.
+3. Local development trusts its local host automatically. For production, set
+   `AUTH_TRUST_HOST=true` only behind a trusted ingress that validates the
+   incoming host. Configure AWS WAF rate limits on public auth
+   endpoints before exposing registration, login, email verification, or
+   password recovery to the internet.
+4. Start the development server with `npm run dev` and open
    `http://localhost:3000`.
 
 To run the Dockerized production build locally, use `docker compose up --build`
@@ -34,7 +44,7 @@ and open `http://localhost:3000`. The compose file runs only the application;
 the project targets MongoDB Atlas and does not bundle a local database service.
 
 Run `npm run lint`, `npm run typecheck`, and `npm run build` to check the
-scaffold. `npm run format:check` verifies formatting.
+application. `npm run format:check` verifies formatting.
 
 ## Tests
 

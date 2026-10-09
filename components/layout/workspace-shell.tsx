@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import styles from "./workspace-shell.module.css";
+import { SignOutButton } from "./sign-out-button";
 
 const navigation = [
   {
@@ -123,6 +124,7 @@ function SidebarContents() {
       <NavigationItems />
 
       <div className={styles.sidebarBottom}>
+        <SignOutButton />
         <span
           aria-disabled="true"
           className={`${styles.navigationItem} ${styles.upcomingItem}`}
