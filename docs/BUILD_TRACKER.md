@@ -51,7 +51,7 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 ### 3. Core planning
 
-- `[ ]` Events and wedding timeline: create, view, edit, delete, event details, venues, and timeline activities.
+- `[~]` Events and wedding timeline implemented: responsive list/search/status filters, create/edit, details, venue and guest guidance, timeline CRUD, tenant/permission checks, overnight scheduling, stale-write checks, and linked-record delete protection. Unit/security checks pass; authenticated Atlas/browser journey and visual acceptance remain to be verified. Event reminders and public schedule delivery belong to later slices.
 - `[ ]` Tasks: assignment, due dates, priorities, statuses, event association, checklists/comments as scoped by the design.
 - `[ ]` Guest and family management: individual guest records, duplicate checks, filtering/search, guest statistics, and import preview/commit for the expected wedding size.
 - `[ ]` Issues: reporting, status/assignment, comments, and activity history.
@@ -103,6 +103,13 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - Do not introduce microservices, Kubernetes, Kafka/RabbitMQ, or Redis without a newly approved concrete requirement.
 
 ## Change log
+
+- Fixed implicit Enter submission in the event form: the primary save button preserves the selected status; only an explicit Save as draft action overrides it. Added regression coverage for both actions.
+
+- Fixed wedding onboarding role creation for the installed Mongoose version: multiple documents in a session require `ordered: true`. The wedding, roles, and owner membership remain in the same transaction.
+
+- Events flow implemented from the refined Stitch direction for desktop, tablet, and mobile. All forms use consistent fields; excluded seating/transport content and design simulators were removed. No planning demo data is inserted.
+- Event services derive tenant/timezone/permissions from verified membership. Default event statuses and optional ceremony type are documented; timeline items are bounded at 100. Sixteen unit/security/component checks cover overnight dates, DST gaps/ambiguity, tenant filters, readonly mutations, stale edits, blocked deletion, timeline bounds, cross-origin input rejection, and UI error recovery. Persistence is mocked in automated checks; authenticated Atlas and browser visual acceptance remain outstanding.
 
 - Initial scaffold completed.
 - Responsive dashboard UI preview created; it currently uses sample data only.

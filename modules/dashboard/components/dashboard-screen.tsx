@@ -206,7 +206,11 @@ export function DashboardScreen({
   const firstName = memberName.trim().split(/\s+/)[0] || "there";
 
   return (
-    <WorkspaceShell searchQuery={cleanQuery}>
+    <WorkspaceShell
+      searchQuery={cleanQuery}
+      weddingTitle={wedding.title}
+      memberName={memberName}
+    >
       <div className={styles.dashboard}>
         <section className={styles.welcome}>
           <div className={styles.welcomeCopy}>

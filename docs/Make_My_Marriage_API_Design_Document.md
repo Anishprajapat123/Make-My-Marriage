@@ -610,18 +610,37 @@ POST /api/v1/events
 ```json
 {
   "name": "Sangeet",
+  "ceremonyType": "Sangeet",
   "description": "Sangeet ceremony",
   "date": "2026-10-19",
   "startTime": "19:00",
+  "endDate": "2026-10-19",
   "endTime": "22:00",
-  "timezone": "Asia/Kolkata",
+  "status": "DRAFT",
   "venue": {
     "name": "Taj Palace",
-    "address": "Hyderabad"
+    "addressLine1": "Main Road",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postalCode": "",
+    "mapUrl": "",
+    "directions": ""
   },
-  "dressCode": "Traditional"
+  "dressCode": "Traditional",
+  "notes": ""
 }
 ```
+
+The server derives timezone and tenant from the session and active membership;
+request bodies do not accept either. Ceremony type, description, dress code,
+notes, state, postal code, map URL, and directions are optional. End date and
+time must both be provided or both left empty. Map URLs accept only HTTP(S).
+Statuses are `DRAFT`, `PUBLISHED`, `COMPLETED`, and `CANCELLED`.
+Reads require `VIEW_EVENTS`; every mutation requires `MANAGE_EVENTS`.
+POST/PATCH requests use `application/json` and reject foreign browser origins.
+GET returns `{ events: [...] }` for lists and `{ event: ... }` for a detail;
+event DTOs contain UTC ISO start/end dates, structured venue data, timeline items,
+and `updatedAt`. Search and status filtering currently run within the Events UI.
 
 ## 12.3 Get event
 
@@ -635,6 +654,9 @@ GET /api/v1/events/:eventId
 PATCH /api/v1/events/:eventId
 ```
 
+Send the complete editable event fields and the last-read `updatedAt`.
+An outdated version returns `409 CONFLICT`; reload before editing again.
+
 ## 12.5 Delete event
 
 ```http
@@ -642,6 +664,10 @@ DELETE /api/v1/events/:eventId
 ```
 
 Deletion should be restricted to users with event-management permissions.
+
+DELETE requires `?updatedAt=<last-read ISO timestamp>`. Linked records block
+deletion with `409 EVENT_HAS_LINKED_RECORDS`. This deletes only the event and
+its embedded timeline, never linked records or member profiles.
 
 ## 12.6 Event timeline/activity items
 
@@ -651,6 +677,12 @@ POST /api/v1/events/:eventId/timeline
 PATCH /api/v1/events/:eventId/timeline/:itemId
 DELETE /api/v1/events/:eventId/timeline/:itemId
 ```
+
+Timeline POST/PATCH bodies contain `title`, local `date`, local `time`, optional
+`note`, and the event's current `updatedAt`. Timeline DELETE uses the same
+`updatedAt` query parameter. Timeline mutations return the refreshed event DTO.
+GET timeline returns `{ items: [...] }`, sorted chronologically. Dates can be
+before the main ceremony for preparation and after midnight for overnight events.
 
 ## 12.7 Event reminders
 

@@ -26,6 +26,7 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 - One wedding is one tenant. A user can have at most one `ACTIVE` or `SUSPENDED` wedding membership at a time. Preserve `REMOVED` membership history; a user with only removed memberships may later join or create a different wedding.
 - Every tenant-owned read and write must include the tenant scope in the database operation. Resolve tenant context on the server from a verified session and membership. Never authorize using a client-supplied `tenantId` alone.
 - A wedding can have multiple members. Authorization must verify both tenant membership and the relevant role/permission for each operation; do not rely only on hidden UI controls.
+- Events use the server-resolved wedding timezone and optional end date/time. Store UTC instants; reject ambiguous/nonexistent daylight-saving times. Event and timeline mutations require the current version, and event deletion must preserve linked records.
 - Guests do not create accounts. Public access is limited to explicitly designed wedding, invitation, RSVP, and livestream flows and must use the corresponding public token/lookup rules. Store only hashed invitation tokens where specified by the database design.
 
 ## Product scope

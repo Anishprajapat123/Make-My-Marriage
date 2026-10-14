@@ -450,6 +450,7 @@ Stores every wedding ceremony or activity block.
 | `_id` | ObjectId | Yes | Event ID |
 | `tenantId` | ObjectId | Yes | Wedding ID |
 | `name` | string | Yes | Example: Haldi |
+| `ceremonyType` | string | No | Optional label, including custom ceremonies; maximum 80 characters |
 | `description` | string/null | No | Event information |
 | `startAt` | Date | Yes | Event start in UTC storage |
 | `endAt` | Date/null | No | Optional end |
@@ -465,6 +466,16 @@ Stores every wedding ceremony or activity block.
 ### Venue
 
 The venue remains embedded because it is tightly coupled to the event and does not require independent lifecycle management.
+
+Events store UTC `startAt` and optional `endAt`. The API converts separate local
+start/end dates and times using the wedding's server-resolved timezone, including
+overnight events. Nonexistent or ambiguous daylight-saving times are rejected.
+Timeline entries contain an ObjectId, `title`, UTC `at`, and optional `note`;
+the embedded list is limited to 100 entries. Preparation entries may precede
+the event's start. Mutations require the current `updatedAt` to prevent stale writes.
+Event deletion is blocked when tenant-scoped tasks, expenses, vendors, albums,
+livestreams, issues, or reminders reference it. Future modules must coordinate
+reference creation with event deletion so concurrent operations cannot create dangling references.
 
 ```json
 {

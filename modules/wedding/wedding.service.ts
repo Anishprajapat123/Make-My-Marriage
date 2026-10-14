@@ -124,7 +124,7 @@ export async function createWeddingForUser(
           isSystemRole: true,
           createdByMemberId: memberId,
         })),
-        { session },
+        { session, ordered: true },
       );
 
       await MemberModel.create(

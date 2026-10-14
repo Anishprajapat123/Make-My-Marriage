@@ -6,8 +6,16 @@ initial account-authentication foundation: local registration with email
 verification, credentials sign-in, password recovery, Auth.js sessions, and a
 protected workspace shell. Wedding onboarding creates the wedding tenant,
 default role templates, and initial owner membership transactionally. The dashboard still
-shows sample planning metrics; tenant-aware planning modules and broader
-membership/permission management are not implemented yet.
+shows sample planning metrics. Events now support responsive lists, creation,
+editing, details, and ceremony timeline management with tenant/permission checks.
+Broader membership/permission management is not implemented yet.
+
+After signing in and completing onboarding, open `/events` from the workspace.
+Create an event, choose its draft/published status, then add timeline items from
+its details page. Times use the wedding timezone; optional end dates allow
+overnight events. Editing/deleting requires the latest event version, and linked
+records prevent event deletion. Public event delivery and event reminders are
+future slices. No sample event records are created.
 
 ## Architecture boundaries
 

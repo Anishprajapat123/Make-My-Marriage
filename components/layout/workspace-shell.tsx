@@ -48,18 +48,22 @@ const navigation = [
   },
 ];
 
-function NavigationItems() {
+function NavigationItems({
+  activePage = "Dashboard",
+}: {
+  activePage?: string;
+}) {
   return (
     <nav aria-label="Workspace navigation" className={styles.navigation}>
       {navigation.map((group) => (
         <div className={styles.navigationGroup} key={group.label}>
           <p className={styles.groupLabel}>{group.label}</p>
           {group.items.map(({ label, icon: Icon, active }) =>
-            active ? (
+            active || label === "Events" ? (
               <Link
-                aria-current="page"
-                className={`${styles.navigationItem} ${styles.activeItem}`}
-                href="/dashboard"
+                aria-current={label === activePage ? "page" : undefined}
+                className={`${styles.navigationItem} ${label === activePage ? styles.activeItem : ""}`}
+                href={label === "Events" ? "/events" : "/dashboard"}
                 key={label}
               >
                 <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
@@ -106,22 +110,32 @@ function BrandLink() {
   );
 }
 
-function SidebarContents() {
+function SidebarContents({
+  activePage,
+  weddingTitle,
+  memberName,
+  roleLabel,
+}: {
+  activePage: string;
+  weddingTitle: string;
+  memberName: string;
+  roleLabel: string;
+}) {
   return (
     <>
       <BrandLink />
 
       <div className={styles.weddingPicker}>
         <span className={styles.weddingInitials}>
-          A<span>·</span>P
+          {weddingTitle.slice(0, 1).toUpperCase()}
         </span>
         <span className={styles.weddingPickerText}>
           <span className={styles.weddingPickerLabel}>Wedding workspace</span>
-          <span className={styles.weddingPickerName}>Anish & Priya</span>
+          <span className={styles.weddingPickerName}>{weddingTitle}</span>
         </span>
       </div>
 
-      <NavigationItems />
+      <NavigationItems activePage={activePage} />
 
       <div className={styles.sidebarBottom}>
         <SignOutButton />
@@ -135,13 +149,12 @@ function SidebarContents() {
         </span>
         <div className={styles.memberCard}>
           <span aria-hidden="true" className={styles.memberAvatar}>
-            A
+            {memberName.slice(0, 1).toUpperCase()}
           </span>
           <span className={styles.memberText}>
-            <span className={styles.memberName}>Anish</span>
-            <span className={styles.memberRole}>Workspace owner</span>
+            <span className={styles.memberName}>{memberName}</span>
+            <span className={styles.memberRole}>{roleLabel}</span>
           </span>
-          <span className={styles.memberBadge}>OWNER</span>
         </div>
       </div>
     </>
@@ -151,14 +164,27 @@ function SidebarContents() {
 export function WorkspaceShell({
   children,
   searchQuery = "",
+  activePage = "Dashboard",
+  weddingTitle = "Wedding workspace",
+  memberName = "Member",
+  roleLabel = "Wedding member",
 }: {
   children: ReactNode;
   searchQuery?: string;
+  activePage?: string;
+  weddingTitle?: string;
+  memberName?: string;
+  roleLabel?: string;
 }) {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <SidebarContents />
+        <SidebarContents
+          activePage={activePage}
+          weddingTitle={weddingTitle}
+          memberName={memberName}
+          roleLabel={roleLabel}
+        />
       </aside>
 
       <div className={styles.mobileHeader}>
@@ -168,7 +194,12 @@ export function WorkspaceShell({
             <Menu aria-hidden="true" size={20} />
           </summary>
           <div className={styles.mobileMenuPanel}>
-            <SidebarContents />
+            <SidebarContents
+              activePage={activePage}
+              weddingTitle={weddingTitle}
+              memberName={memberName}
+              roleLabel={roleLabel}
+            />
           </div>
         </details>
       </div>
@@ -178,65 +209,69 @@ export function WorkspaceShell({
           <div className={styles.breadcrumb}>
             <span>Workspace</span>
             <span aria-hidden="true">/</span>
-            <strong>Dashboard</strong>
+            <strong>{activePage}</strong>
           </div>
-          <div className={styles.topbarActions}>
-            <form
-              action="/dashboard"
-              className={styles.searchBox}
-              role="search"
-            >
-              <button aria-label="Search sample dashboard" type="submit">
-                <Search aria-hidden="true" size={16} />
-              </button>
-              <input
-                aria-label="Search sample dashboard content"
-                defaultValue={searchQuery}
-                name="q"
-                placeholder="Search this dashboard"
-                type="search"
-              />
-              <kbd>Enter</kbd>
-            </form>
-            <details className={styles.headerPopover}>
-              <summary
-                aria-label="Open sample notifications"
-                className={styles.iconButton}
+          {activePage === "Dashboard" && (
+            <div className={styles.topbarActions}>
+              <form
+                action="/dashboard"
+                className={styles.searchBox}
+                role="search"
               >
-                <Bell aria-hidden="true" size={19} />
-                <span className={styles.notificationDot} />
-              </summary>
-              <div className={styles.popoverPanel}>
-                <strong>Recent updates</strong>
-                <p>Priya added 5 guests to the sample list.</p>
-                <p>Photography payment is due in 5 days.</p>
-                <span>Preview notifications · not live</span>
-              </div>
-            </details>
-            <details className={styles.headerPopover}>
-              <summary
-                aria-label="Open dashboard help"
-                className={styles.iconButton}
-              >
-                <CircleHelp aria-hidden="true" size={19} />
-              </summary>
-              <div className={styles.popoverPanel}>
-                <strong>About this dashboard</strong>
-                <p>
-                  This is a responsive UI preview built from sample wedding
-                  data.
-                </p>
-                <span>
-                  Actions and records are not connected to an account yet.
-                </span>
-              </div>
-            </details>
-          </div>
+                <button aria-label="Search sample dashboard" type="submit">
+                  <Search aria-hidden="true" size={16} />
+                </button>
+                <input
+                  aria-label="Search sample dashboard content"
+                  defaultValue={searchQuery}
+                  name="q"
+                  placeholder="Search this dashboard"
+                  type="search"
+                />
+                <kbd>Enter</kbd>
+              </form>
+              <details className={styles.headerPopover}>
+                <summary
+                  aria-label="Open sample notifications"
+                  className={styles.iconButton}
+                >
+                  <Bell aria-hidden="true" size={19} />
+                  <span className={styles.notificationDot} />
+                </summary>
+                <div className={styles.popoverPanel}>
+                  <strong>Recent updates</strong>
+                  <p>Priya added 5 guests to the sample list.</p>
+                  <p>Photography payment is due in 5 days.</p>
+                  <span>Preview notifications · not live</span>
+                </div>
+              </details>
+              <details className={styles.headerPopover}>
+                <summary
+                  aria-label="Open dashboard help"
+                  className={styles.iconButton}
+                >
+                  <CircleHelp aria-hidden="true" size={19} />
+                </summary>
+                <div className={styles.popoverPanel}>
+                  <strong>About this dashboard</strong>
+                  <p>
+                    This is a responsive UI preview built from sample wedding
+                    data.
+                  </p>
+                  <span>
+                    Actions and records are not connected to an account yet.
+                  </span>
+                </div>
+              </details>
+            </div>
+          )}
         </header>
         {children}
-        <footer className={styles.previewFooter}>
-          Dashboard preview · sample data only
-        </footer>
+        {activePage === "Dashboard" && (
+          <footer className={styles.previewFooter}>
+            Dashboard preview · sample data only
+          </footer>
+        )}
       </main>
     </div>
   );

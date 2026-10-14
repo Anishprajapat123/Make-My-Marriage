@@ -44,7 +44,13 @@ export async function POST(request: Request) {
       );
     }
 
-    console.error("WEDDING_ONBOARDING_FAILED");
+    console.error("WEDDING_ONBOARDING_FAILED", {
+      name: error instanceof Error ? error.name : "UnknownError",
+      code:
+        typeof error === "object" && error !== null && "code" in error
+          ? error.code
+          : undefined,
+    });
     return errorResponse(
       "SERVICE_UNAVAILABLE",
       "Wedding setup is temporarily unavailable. Please try again.",

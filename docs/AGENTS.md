@@ -15,6 +15,7 @@ This file is the project-specific development guide. The four design documents i
 - One wedding is one tenant. A user may have at most one `ACTIVE` or `SUSPENDED` membership at a time. Retain `REMOVED` membership history; a user with no active or suspended membership may later join or create another wedding.
 - Every tenant-owned database read and write must be scoped by `tenantId`. Resolve tenant context on the server from a verified authenticated membership; never trust a client-supplied tenant ID.
 - A wedding may have multiple members. Enforce membership and the required role/permission on the server for every protected operation; UI visibility is not authorization.
+- Event reads require `VIEW_EVENTS`, mutations require `MANAGE_EVENTS`; resolve timezone from the wedding. Support overnight schedules and optional ends, bounded timeline entries, stale-write protection, and blocked deletion of linked events. Keep desktop/mobile fields consistent; ceremony type is optional.
 - Guests have no accounts. Limit guest access to designed public pages, invitation links, RSVP, and public livestream lookup. Validate/expire/revoke tokens as designed, store invitation tokens hashed when specified, and avoid leaking tenant data through public endpoints.
 
 ## Product boundaries
