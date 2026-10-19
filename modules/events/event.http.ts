@@ -5,27 +5,7 @@ import {
   type TenantContext,
 } from "@/lib/tenant/context";
 import { errorResponse, successResponse } from "@/lib/http/responses";
-export async function readEventBody(request: Request) {
-  if (
-    request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !==
-    "application/json"
-  ) {
-    throw new AccessError(
-      415,
-      "UNSUPPORTED_MEDIA_TYPE",
-      "Send an application/json request body.",
-    );
-  }
-  const origin = request.headers.get("origin");
-  const expected = new URL(process.env.APP_BASE_URL ?? request.url).origin;
-  if (origin && origin !== expected)
-    throw new AccessError(
-      403,
-      "FORBIDDEN",
-      "Requests must come from this application.",
-    );
-  return request.json();
-}
+export { readJsonBody as readEventBody } from "@/lib/http/json-body";
 export async function eventRequest(
   permission: string,
   operation: (ctx: TenantContext) => Promise<unknown>,

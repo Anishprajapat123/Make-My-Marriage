@@ -266,6 +266,22 @@
   border-top: 1px solid #e7e2da;
   margin-top: 24px;
 }
+
+.optionalDetails {
+  border-top: 1px solid #e7e2da;
+  margin-top: 24px;
+}
+.optionalDetails summary {
+  min-height: 44px;
+  padding: 16px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+.optionalDetails summary:focus-visible {
+  outline: 3px solid #c8a6bb;
+  outline-offset: 3px;
+}
 .formFooter {
   display: flex;
   justify-content: space-between;
@@ -350,8 +366,15 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .group {
-    grid-template-columns: 135px minmax(0, 1fr);
-    gap: 20px;
+    display: block;
+  }
+  .day {
+    border-right: 0;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  .cardInfo {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 640px) {

@@ -605,6 +605,27 @@
   margin: 17px 0 0 10px;
 }
 
+.timelinePreview > div {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+}
+
+.timelinePreview .timelineTime {
+  white-space: nowrap;
+}
+
+.timelinePreview .timelineDotMuted {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.timelinePreview > div:last-child {
+  grid-row: 3;
+}
+
 .timelineDot,
 .timelineDotMuted {
   width: 7px;

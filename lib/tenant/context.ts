@@ -20,7 +20,7 @@ export type TenantContext = {
   roleKeys: string[];
 };
 export async function requireTenant(
-  permission: string,
+  permission: string | readonly string[],
 ): Promise<TenantContext> {
   const session = await auth();
   if (!session?.user?.id)
@@ -32,7 +32,8 @@ export async function requireTenant(
       "NO_WORKSPACE",
       "An active wedding membership is required.",
     );
-  if (!current.effectivePermissions.includes(permission))
+  const accepted = typeof permission === "string" ? [permission] : permission;
+  if (!accepted.some((key) => current.effectivePermissions.includes(key)))
     throw new AccessError(
       403,
       "FORBIDDEN",

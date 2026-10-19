@@ -507,7 +507,7 @@ POST /api/v1/members/invitations
 ```json
 {
   "email": "family@example.com",
-  "roleId": "role_family_member"
+  "roleIds": ["507f1f77bcf86cd799439011"]
 }
 ```
 
@@ -527,7 +527,8 @@ PATCH /api/v1/members/:memberId
 
 ```json
 {
-  "roleId": "role_organizer"
+  "roleIds": ["507f1f77bcf86cd799439012"],
+  "updatedAt": "2026-10-16T00:00:00.000Z"
 }
 ```
 
@@ -544,6 +545,20 @@ POST /api/v1/members/invitations/:token/accept
 ```
 
 The token must be high entropy and time-limited where appropriate.
+
+## 10.7 Implemented member lifecycle contract
+
+- Existing roles are selected with `roleIds[]` (1–10 distinct tenant-scoped IDs); singular `roleId` mutation bodies are not accepted. Custom-role editing and ownership transfer are deferred.
+- Every management endpoint requires active server-resolved `MANAGE_MEMBERS` access. Owners cannot be targeted, ownership cannot be assigned, and self-access edits/removal are blocked. Other managers cannot assign or manage roles containing permissions they do not hold. Mutations revalidate actor access inside the transaction.
+- Member GET supports `q`, `roleId`, `status` (`ACTIVE`, `SUSPENDED`, `REMOVED`), and `page` (25 records). Counts reflect all tenant members before filtering. Member PATCH accepts optional `roleIds`/`status` plus required current `updatedAt`. DELETE performs a retained-history removal and requires JSON `{ "updatedAt": "..." }`. Removed members must accept a fresh invitation to rejoin.
+- `GET /api/v1/roles` lists existing roles plus whether they are assignable by the current manager. `GET /api/v1/members/invitations?page=1` returns paginated invitation history. No stored raw token or reusable link is returned by listing.
+- Creation returns `id`, `expiresAt`, one-time-displayed `link`, `emailSent`, and `message`. Invitations expire after seven days. SES acceptance is reported separately from database creation; an email failure leaves a valid invitation whose link can be copied immediately. `emailSent` means SES accepted the send request, not proof of inbox delivery.
+- `PATCH /api/v1/members/invitations/:invitationId` accepts `action: REVOKE | REPLACE` and current `updatedAt`. Replacement atomically revokes the prior invitation and creates a new token/expiry, then attempts email delivery. Historical records are retained without TTL deletion.
+- `/join/:token` stores a validated-format bearer token in an HTTP-only, SameSite=Lax cookie (Secure in production) and redirects to `/join` without exposing wedding details. Login/registration preserve this route through email verification in the same browser. Anonymous users receive generic account-entry UI only.
+- `GET /api/v1/membership-invitation` previews the cookie-held invitation only for the verified invited email. `POST` accepts it using a JSON body and clears the cookie on success. The documented token-path acceptance endpoint is also available; browser UI uses the cookie endpoint to keep the raw token out of client components.
+- `DELETE /api/v1/membership-invitation` accepts a same-origin JSON request and clears only the browser's invitation cookie, without revoking the invitation or changing membership. It also works before sign-in. Authenticated preview clears the cookie on terminal 404/410 responses; wrong-account responses preserve it for account switching.
+- Acceptance revalidates the inviter and offered roles, compares normalized verified email, checks expiry/revocation, and atomically creates/reactivates membership and consumes the invitation. A retained removed membership in the same wedding is reactivated, preserving references. Same-account repeat acceptance while that membership remains active is idempotent; old accepted links cannot restore removed/suspended membership.
+- Membership conflicts disclose no other wedding's identity. Stale manager writes return 409; wrong accounts return 403; invalid/unavailable invitations return 404/410. All JSON mutations reject foreign browser origins. Sensitive responses use no-store caching.
 
 ---
 
@@ -698,7 +713,7 @@ GET  /api/v1/events/:eventId/reminders
 ## 13.1 List tasks
 
 ```http
-GET /api/v1/tasks?status=TODO&assigneeId=user_123&eventId=event_123
+GET /api/v1/tasks?status=TODO&assigneeMemberId=507f1f77bcf86cd799439011&eventId=507f1f77bcf86cd799439012
 ```
 
 Supported filters:
@@ -722,8 +737,8 @@ POST /api/v1/tasks
 {
   "title": "Book Photographer",
   "description": "Finalize photographer contract",
-  "eventId": "event_wedding",
-  "assigneeId": "user_123",
+  "eventId": "507f1f77bcf86cd799439012",
+  "assigneeMemberIds": ["507f1f77bcf86cd799439011"],
   "dueAt": "2026-10-10T18:00:00Z",
   "priority": "HIGH"
 }
@@ -756,12 +771,28 @@ POST /api/v1/tasks/:taskId/comments
 
 ## 13.7 Task templates
 
+Templates are deferred from the first Tasks implementation slice.
+
 ```http
 GET  /api/v1/task-templates
 POST /api/v1/task-templates/apply
 ```
 
 A template application operation should create tenant-owned tasks and must be idempotent when a client retries the same request.
+
+## Implemented Tasks slice contract
+
+Assignments use wedding membership IDs, not user IDs. Every operation resolves the active tenant on the server. `VIEW_TASKS` grants wedding-wide reads; `MANAGE_TASKS` grants full task CRUD and comment posting. `VIEW_ASSIGNED_TASKS`/`UPDATE_ASSIGNED_TASKS` restrict access to tasks assigned to the current membership. Assigned members may read comments/activity and change status or existing checklist completion only.
+
+- List supports `q`, `status`, `priority`, `eventId`, `assigneeMemberId`, `mine=true`, `overdue=true`, and `page` (25 records per page). Counts represent the caller's entire accessible scope before filters. Due-date ranges remain a later extension.
+- `GET /api/v1/tasks/options` returns planner-only event/member IDs and display names. References must belong to the same wedding; assignees must be active.
+- Create supports optional event, zero to 30 distinct assignees, UTC `dueAt` or null, priority/status, and up to 50 checklist items (`id` UUID, `title`, `done`). UI deadlines use the wedding timezone.
+- PATCH requires integer `revision`. Omitted fields remain unchanged. Assigned-only PATCH accepts `revision`, optional `status`, and optional checklist entries with only `id`/`done`; steps cannot be added, removed, or renamed.
+- DELETE requires JSON `{ "revision": 0 }` with the current revision. Comments are removed atomically; append-only audit records remain.
+- Comment GET accepts `page` (25 per page). POST accepts `{ "body": "..." }` (1–2,000 characters), planners only.
+- `GET /api/v1/tasks/:taskId/activity?page=1` returns scoped, paginated history with actor display names. Creation, updates, deletion, and comments are logged atomically.
+- Stale writes return 409. Out-of-scope task IDs return 404. JSON mutations reject foreign browser origins.
+- Calendar/Kanban, templates, and task notifications are outside this slice.
 
 ---
 

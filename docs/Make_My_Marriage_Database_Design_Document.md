@@ -377,6 +377,15 @@ in a different wedding.
 
 ## 9.1 `member_invitations` Collection
 
+Implemented policy: seven-day validity, normalized invited email, multiple existing roles,
+SHA-256 token hashes, no TTL deletion, and a fresh token on replacement. Only creation
+or replacement returns the raw link; listings never reconstruct it. Membership and
+invitation transitions append activity in the same transaction. An internal
+`wedding_members.accessVersion` counter serializes actor authorization against concurrent
+membership/role changes without changing the actor's displayed `updatedAt`. Manager
+updates use the target's current `updatedAt` for optimistic concurrency. Same-wedding
+rejoining reactivates the retained removed row so historical references remain valid.
+
 Stores invitations separately so an invite can be sent before the recipient
 has an application account. It is tenant-scoped and does not reserve the
 recipient's one-wedding membership until the invitation is accepted.
@@ -501,6 +510,10 @@ There is no event-level guest mapping collection in V1.
 ---
 
 # 12. `tasks` Collection
+
+The first implementation bounds assignments at 30 distinct active wedding members and checklists at 50 steps. Each checklist entry has a stable UUID `id`, `title`, and `done`. Integer `revision` increments on task changes and is required for updates/deletion; internal `commentVersion` coordinates comment creation against concurrent task deletion. Comments remain separate. Task mutations write append-only `activity_logs` in the same transaction.
+
+Task event-link writes increment an internal `events.referenceVersion` in the same transaction, without changing event `updatedAt`. This coordinates with event deletion to prevent dangling task references without invalidating unrelated event edits.
 
 Wedding planning and execution tasks.
 

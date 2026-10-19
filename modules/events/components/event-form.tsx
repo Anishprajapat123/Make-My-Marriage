@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
@@ -67,6 +67,7 @@ function FormContent({
     updatedAt: event?.updatedAt,
   });
   const [pending, setPending] = useState(false);
+  const optionalDetails = useRef<HTMLDetailsElement>(null);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   function update(path: string, value: string) {
@@ -134,6 +135,16 @@ function FormContent({
     };
     const p = eventInputSchema.safeParse(input);
     if (!p.success) {
+      if (
+        p.error.issues.some(
+          (i) =>
+            i.path[0] === "venue" ||
+            i.path[0] === "dressCode" ||
+            i.path[0] === "notes",
+        )
+      ) {
+        if (optionalDetails.current) optionalDetails.current.open = true;
+      }
       setErrors(
         Object.fromEntries(
           p.error.issues.map((i) => [i.path.join("."), i.message]),
@@ -221,16 +232,21 @@ function FormContent({
               <h2>Venue & location</h2>
               {field("venue.name", "Venue name", "text", true)}
               {field("venue.addressLine1", "Address", "text", true, 300)}
-              <div className={styles.fieldGrid}>
-                {field("venue.city", "City", "text", true, 120)}
-                {field("venue.state", "State", "text", false, 120)}
-              </div>
+              {field("venue.city", "City", "text", true, 120)}
+            </section>
+            <details
+              ref={optionalDetails}
+              className={styles.optionalDetails}
+              onInvalidCapture={() => {
+                if (optionalDetails.current)
+                  optionalDetails.current.open = true;
+              }}
+            >
+              <summary>Optional venue & guest details</summary>
+              {field("venue.state", "State", "text", false, 120)}
               {field("venue.postalCode", "Postal code", "text", false, 20)}
               {field("venue.mapUrl", "Map URL", "url", false, 2048)}
               {field("venue.directions", "Directions", "textarea", false, 1000)}
-            </section>
-            <section className={styles.section}>
-              <h2>Guest guidance</h2>
               {field("dressCode", "Dress code", "text", false, 300)}
               {field(
                 "notes",
@@ -239,7 +255,7 @@ function FormContent({
                 false,
                 2000,
               )}
-            </section>
+            </details>
             <p className={styles.notice}>
               All wedding guests are invited to every event. Published events
               can appear in your enabled guest-facing schedule; drafts remain

@@ -59,11 +59,22 @@ function NavigationItems({
         <div className={styles.navigationGroup} key={group.label}>
           <p className={styles.groupLabel}>{group.label}</p>
           {group.items.map(({ label, icon: Icon, active }) =>
-            active || label === "Events" ? (
+            active ||
+            label === "Events" ||
+            label === "Tasks" ||
+            label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
                 className={`${styles.navigationItem} ${label === activePage ? styles.activeItem : ""}`}
-                href={label === "Events" ? "/events" : "/dashboard"}
+                href={
+                  label === "Events"
+                    ? "/events"
+                    : label === "Tasks"
+                      ? "/tasks"
+                      : label === "Members"
+                        ? "/members"
+                        : "/dashboard"
+                }
                 key={label}
               >
                 <Icon aria-hidden="true" size={18} strokeWidth={1.8} />

@@ -410,7 +410,7 @@ host handling only behind a host-filtering production ingress.
 |-----------------------|-------------------------------------------------|
 | Wedding               | VIEW_WEDDING, MANAGE_WEDDING, MANAGE_MEMBERS    |
 | Events                | VIEW_EVENTS, MANAGE_EVENTS                      |
-| Tasks                 | VIEW_TASKS, MANAGE_TASKS                        |
+| Tasks                 | VIEW_TASKS, MANAGE_TASKS, VIEW_ASSIGNED_TASKS, UPDATE_ASSIGNED_TASKS |
 | Guests                | VIEW_GUESTS, MANAGE_GUESTS, IMPORT_GUESTS       |
 | RSVP / Invitations    | VIEW_RSVP, MANAGE_INVITATIONS                   |
 | Expenses              | VIEW_EXPENSES, MANAGE_EXPENSES, MANAGE_PAYMENTS |
@@ -481,7 +481,7 @@ createdAt, updatedAt<br />
 Task<br />
 {<br />
 _id, tenantId, eventId, title, description,<br />
-assignedToUserId, dueAt, priority, status,<br />
+assigneeMemberIds[], dueAt, priority, status,<br />
 checklist[], createdAt, updatedAt<br />
 }<br />
 <br />
@@ -506,7 +506,7 @@ uploadedByUserId, createdAt<br />
 | wedding_members | partial unique userId for active/suspended; unique tenantId + userId |
 | member_invitations  | partial unique tenantId + normalizedEmail while pending; unique tokenHash |
 | events              | tenantId + startAt                                                        |
-| tasks               | tenantId + status + dueAt; tenantId + assignedToUserId + status           |
+| tasks               | tenantId + status + dueAt; tenantId + assigneeMemberIds + status + dueAt |
 | guest_groups        | tenantId + normalizedFamilyName                                           |
 | guests              | tenantId + normalizedPhone; tenantId + normalizedName; tenantId + groupId |
 | rsvps               | unique tenantId + guestGroupId; tenantId + status                         |

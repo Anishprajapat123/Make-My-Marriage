@@ -308,10 +308,12 @@ export function AuthScreen({
   variant,
   token = "",
   googleEnabled = false,
+  returnTo = "/dashboard",
 }: {
   variant: AuthScreenVariant;
   token?: string;
   googleEnabled?: boolean;
+  returnTo?: "/dashboard" | "/join";
 }) {
   const router = useRouter();
   const content = pageContent[variant];
@@ -340,14 +342,14 @@ export function AuthScreen({
           email,
           password,
           redirect: false,
-          redirectTo: "/dashboard",
+          redirectTo: returnTo,
         });
         if (!result?.ok || result.error) {
           throw new Error(
             "We couldn’t sign you in. Check your details and verify your email address.",
           );
         }
-        router.replace(result.url ?? "/dashboard");
+        router.replace(returnTo);
         router.refresh();
         return;
       }
@@ -404,7 +406,7 @@ export function AuthScreen({
       return;
     }
     setPending(true);
-    await signIn("google", { redirectTo: "/dashboard" });
+    await signIn("google", { redirectTo: returnTo });
   }
 
   return (

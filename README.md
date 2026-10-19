@@ -64,3 +64,90 @@ application. `npm run format:check` verifies formatting.
 - Place unit, component, API, integration, and security tests under `tests/`.
   Async Server Components should be covered through E2E tests because Vitest
   does not currently run them directly.
+
+The live workspace walkthrough in `tests/e2e/workspace-flow.spec.ts` requires
+`TEST_LOGIN_EMAIL` and `TEST_LOGIN_PASSWORD` in the test process environment.
+Use an existing verified account with a wedding and event-management permissions
+against your local development database. The test creates clearly named disposable
+event/timeline records and removes them in cleanup. It checks login, existing
+membership rejection, event CRUD, timeline CRUD, version conflicts, mobile
+navigation, and sign-out. Screenshots at desktop/tablet/mobile widths are saved
+under ignored `test-results/`. Do not commit credentials or authenticated traces.
+
+## Tasks first slice
+
+Open `/tasks` after signing in and completing wedding setup. Planners can create,
+edit, assign, filter, and delete tasks, maintain checklists, and post comments.
+Assigned family members can see their own tasks and update status/checklist
+completion. Deadlines use the wedding timezone; storage is UTC. No sample tasks
+are inserted. Task counts, comments, and change history come from MongoDB.
+
+New weddings receive explicit assigned-task permissions for the Family Member
+system role. Existing weddings need a deliberate migration; custom roles are not
+changed. From the repository root, inspect the selected wedding's dry-run first:
+
+```powershell
+node --env-file=.env.local scripts/migrate-task-permissions.mjs --tenant=<wedding-object-id>
+```
+
+Then repeat with `--apply`. Replace `<wedding-object-id>` with the actual wedding
+ID, without angle brackets. This idempotent script updates only that wedding's
+`FAMILY_MEMBER` system role and refuses roles with broad task permissions. It
+never prints connection strings. Do not run against production without reviewing
+the target environment. Owners/organizers already have full task permissions.
+
+Family Admin templates also include assigned-task permissions so the strict
+member-management permission check permits managing Family Members. For existing
+weddings, run the same dry-run with `--role=FAMILY_ADMIN`, review the selected
+tenant, then repeat with `--apply`. The default remains `FAMILY_MEMBER`; neither
+variant changes custom roles or runs automatically.
+
+The first slice includes list/form/details and paginated comments/activity.
+Templates, calendar/Kanban, and task notifications remain later work. The first
+slice passes automated development verification, including actual separate-session
+tenant/assigned access and desktop/tablet/mobile layouts. See
+[`docs/QA_REVIEW.md`](docs/QA_REVIEW.md) for scope, limitations, and the explicitly
+enabled live QA command. It creates temporary fixtures and cleans them afterward;
+production/load/concurrent-race acceptance remains separate.
+
+## Members and collaborator invitations
+
+Open `/members` as a user with `MANAGE_MEMBERS`. This slice supports multiple
+existing roles, invitation history, seven-day invitation links, and member
+suspend/restore/remove actions. Owner memberships and self-access changes are
+protected. Removed membership history and its task/comment references are retained.
+
+Invitations use the existing `APP_BASE_URL`, `AWS_REGION`, `SES_FROM_EMAIL`, and
+AWS credentials configuration. SES sandbox restrictions still apply. Creation
+reports whether SES accepted the send request separately from invitation creation;
+it does not claim inbox delivery. Copy the link while the issuance/replacement
+result is visible; only its hash is stored. Replacement invalidates the old link.
+
+Recipients open `/join/<token>`, then sign in or register and verify the invited
+email. An HTTP-only cookie preserves the invitation in the same browser; recipients
+using another browser should reopen their invitation there. Joining requires an
+explicit confirmation and cannot create a second active/suspended membership.
+Recipients can dismiss the invitation and continue to their workspace or normal
+sign-in. Invalid, expired, and revoked invitations clear the journey cookie after
+authenticated lookup; wrong-account errors retain it for account switching.
+
+The first Members slice is verified in development, including separate-account
+acceptance, role/status restrictions, concurrent acceptance across two weddings,
+and responsive layouts. One authorized SES test reached the user's inbox. See
+[`docs/MEMBERS_QA_REVIEW.md`](docs/MEMBERS_QA_REVIEW.md) for the precise scope and
+remaining production/load checks.
+
+To rerun the isolated live Members test with temporary development records:
+
+```powershell
+npm run build
+$env:RUN_MEMBERS_LIVE_QA='1'
+npm run test:e2e -- --config playwright.members.config.ts
+```
+
+The separate standalone server runs on port 3101 with email disabled. Registration
+verification uses a temporary known-token fixture; no email is sent to QA accounts.
+The real SES check requires the additional explicit `RUN_REAL_SES_MEMBER_QA=1`
+opt-in and separate approval to send its single test email to the fixed test
+recipient. Keep it disabled during ordinary reruns. Test credentials are random,
+remain in memory, and generated records are cleaned in `finally`.

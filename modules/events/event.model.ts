@@ -15,6 +15,7 @@ const eventSchema = new Schema(
       ref: "WeddingMember",
     },
     name: { type: String, required: true, maxlength: 160 },
+    referenceVersion: { type: Number, default: 0, select: false },
     ceremonyType: { type: String, default: "", maxlength: 80 },
     description: { type: String, default: "", maxlength: 2000 },
     startAt: { type: Date, required: true },

@@ -51,6 +51,8 @@ export const DEFAULT_WEDDING_ROLES = [
       "MANAGE_EVENTS",
       "VIEW_TASKS",
       "MANAGE_TASKS",
+      "VIEW_ASSIGNED_TASKS",
+      "UPDATE_ASSIGNED_TASKS",
       "VIEW_GUESTS",
       "MANAGE_GUESTS",
       "IMPORT_GUESTS",
@@ -73,7 +75,11 @@ export const DEFAULT_WEDDING_ROLES = [
     key: "FAMILY_MEMBER",
     name: "Family Member",
     description: "Planning visibility and issue reporting.",
-    permissionKeys: VIEWER_PERMISSION_KEYS,
+    permissionKeys: [
+      ...VIEWER_PERMISSION_KEYS,
+      "VIEW_ASSIGNED_TASKS",
+      "UPDATE_ASSIGNED_TASKS",
+    ],
   },
   {
     key: "ORGANIZER",

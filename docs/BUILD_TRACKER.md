@@ -4,6 +4,14 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Status key
 
+Review fixes (19 October 2026): Family Admin templates now include assigned-task
+permissions, with an explicit tenant-scoped migration option for existing system
+roles. Invitation journeys can be dismissed without changing the invitation;
+terminal lookup errors clear the cookie, while wrong-account errors preserve it.
+No live role migration was applied automatically.
+Lint, TypeScript checking, formatting, and the production build pass after these
+review fixes. The earlier live QA results remain documented separately.
+
 - `[x]` Complete and verified for its stated scope.
 - `[~]` In progress.
 - `[ ]` Not started.
@@ -46,13 +54,13 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - `[~]` Responsive wedding setup and validated onboarding API create the wedding tenant, default system role templates, and initial owner membership in one MongoDB transaction. Verify transaction rollback, duplicate membership, and concurrent creation behavior before marking complete.
 - `[ ]` Resolve tenant context from the verified session and membership on the server.
 - `[ ]` Enforce one active or suspended wedding membership per account; retain removed history and allow a removed member to join or create another wedding.
-- `[ ]` Member management, member invitations/acceptance, custom roles, and permission checks.
+- `[x]` Members first slice implemented and development-verified: multiple roles, invite/list/revoke/replace/expiry, verified acceptance, suspend/restore/remove/rejoin, owner/self/permission protections, stale edits, and transactional one-membership enforcement. The isolated standalone-browser journey uses separate accounts/two weddings, exercises concurrent acceptance and responsive states, and cleans up QA records. One authorized SES test reached the user's inbox. Production/load verification, custom-role editing, and ownership transfer remain separate work.
 - `[ ]` Verify that guests never need accounts and that UI visibility is not used as authorization.
 
 ### 3. Core planning
 
-- `[~]` Events and wedding timeline implemented: responsive list/search/status filters, create/edit, details, venue and guest guidance, timeline CRUD, tenant/permission checks, overnight scheduling, stale-write checks, and linked-record delete protection. Unit/security checks pass; authenticated Atlas/browser journey and visual acceptance remain to be verified. Event reminders and public schedule delivery belong to later slices.
-- `[ ]` Tasks: assignment, due dates, priorities, statuses, event association, checklists/comments as scoped by the design.
+- `[~]` Events and wedding timeline implemented: responsive list/search/status filters, create/edit, details, venue and guest guidance, timeline CRUD, tenant/permission checks, overnight scheduling, stale-write checks, and linked-record delete protection. Live verified-owner Atlas/browser journey passes at desktop/tablet/mobile widths; two-account isolation, fresh onboarding, and final user visual acceptance remain separate checks. Event reminders and public schedule delivery belong to later slices.
+- `[x]` Tasks first slice implemented and verified in development: list/filter/counts, create/edit/details, assignments, timezone deadlines, bounded checklists, planner comments, audit history, assigned-task scope, and revisions. Live Atlas/Playwright checks use two temporary weddings and planner/family sessions, including suspended access, stale writes, foreign/inactive references, linked-event deletion, and error recovery. Desktop/tablet/mobile screenshots have no horizontal overflow. Templates/boards/task notifications and production/load/concurrency acceptance remain later work.
 - `[ ]` Guest and family management: individual guest records, duplicate checks, filtering/search, guest statistics, and import preview/commit for the expected wedding size.
 - `[ ]` Issues: reporting, status/assignment, comments, and activity history.
 - `[ ]` Activity log for important workspace changes.
@@ -103,6 +111,18 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - Do not introduce microservices, Kubernetes, Kafka/RabbitMQ, or Redis without a newly approved concrete requirement.
 
 ## Change log
+
+- 19 October 2026: Members verification passes with 57 unit/security/component tests and the live standalone Playwright journey. Added concise role-checkbox accessible names and removed irrelevant migration wording from role descriptions. Tested registration/verification continuation using a seeded QA verification token, actual acceptance/rejoin, permission/status boundaries, expired/revoked links, stale UI recovery, list failure/retry, and concurrent acceptance across two weddings. A separately approved single SES email was sent only after verifying `anish-dev` and the user confirmed inbox receipt. Temporary accounts, weddings, and invitations were cleaned and a read-only check found zero remaining. No personal account/membership changes or AWS infrastructure changes were made during verification.
+
+- Members implementation uses the new Stitch desktop/mobile list direction. Invitation and access forms/acceptance screens extend that theme because separate Stitch designs were not provided. Approved multiple roles, SES plus copy-link, seven-day expiry, and conservative owner/self/permission protections. An HTTP-only invitation cookie preserves the journey through account verification/sign-in and keeps bearer tokens out of client auth state. No live invitation emails have been sent during implementation.
+
+- Members design preparation: checked the Stitch project (25 screens); no wedding-member management or invitation-acceptance screens were present. Added `MEMBERS_STITCH_PROMPT.md` for desktop/mobile/tablet design, including invitation and membership lifecycle states. Role cardinality, delivery/expiry, owner protection, and lifecycle API contracts remain decisions before implementation. No member feature code added in this step.
+
+- Tasks verification: 46 unit/security/component checks and the opt-in live two-tenant Tasks journey pass. Fixed the event reference guard so cached development Mongoose schemas cannot strip the transactional update; it now uses explicit tenant/event ObjectIds in a native MongoDB update. Temporary QA records were removed, with a separate read-only check confirming zero remaining QA users/weddings. Existing personal wedding roles were not migrated.
+
+- Live local review: 20 unit/security/component checks and the authenticated owner Playwright journey pass. Temporary QA events are removed. Login/account screens, mobile navigation, event/timeline CRUD, overnight scheduling, duplicate onboarding rejection, stale writes, and sign-out were exercised; screenshots cover desktop/tablet/mobile widths.
+- Improved dashboard preview timeline spacing, stacked Events date groups at tablet width, and collapsed optional venue/guest form details with values preserved on submission.
+- Approved Tasks access: planners manage all tasks; family members view only assigned tasks and update their status/checklists. Refined Stitch designs were approved and used for the first slice. Existing family system roles require the explicit tenant-scoped permission migration described in README; it has not been applied automatically.
 
 - Fixed implicit Enter submission in the event form: the primary save button preserves the selected status; only an explicit Save as draft action overrides it. Added regression coverage for both actions.
 
