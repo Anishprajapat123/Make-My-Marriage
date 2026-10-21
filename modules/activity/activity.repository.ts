@@ -54,6 +54,8 @@ export async function resourceActivity(
   );
   return entries.map((e) => ({
     ...e,
-    actorName: authors.get(String(e.actorMemberId)) ?? "Former member",
+    actorName: e.actorMemberId
+      ? (authors.get(String(e.actorMemberId)) ?? "Former member")
+      : "Wedding guest",
   }));
 }

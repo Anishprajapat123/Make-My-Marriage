@@ -19,6 +19,7 @@ const guestSchema = new Schema(
     side: { type: String, enum: GUEST_SIDES, default: "OTHER" },
     guestType: { type: String, enum: GUEST_TYPES, default: "PRIMARY" },
     addedByGuestId: { type: Schema.Types.ObjectId, default: null },
+    rsvpClientId: { type: String, default: null, select: false },
     source: {
       type: String,
       enum: ["ADMIN", "MEMBER", "GUEST_RSVP", "IMPORT"],
@@ -34,6 +35,13 @@ guestSchema.index({ tenantId: 1, familyId: 1, normalizedName: 1, _id: 1 });
 guestSchema.index({ tenantId: 1, normalizedName: 1, _id: 1 });
 guestSchema.index({ tenantId: 1, phone: 1 });
 guestSchema.index({ tenantId: 1, email: 1 });
+guestSchema.index(
+  { tenantId: 1, addedByGuestId: 1, rsvpClientId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { rsvpClientId: { $type: "string" } },
+  },
+);
 guestSchema.index({ tenantId: 1, status: 1, normalizedName: 1, _id: 1 });
 const familySchema = new Schema(
   {

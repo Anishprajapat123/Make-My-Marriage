@@ -1316,3 +1316,11 @@ permission matrices, and an incremental delivery plan.</p></th>
 <tbody>
 </tbody>
 </table>
+
+## Implemented invitation / RSVP slice — 21 October 2026
+
+Family Member now has VIEW_EVENTS for the full workspace schedule, without event mutation permission. Anonymous attendees see only published events through their personal invitation token.
+
+Invitation configuration/lifecycle belongs to modules/invitations; response mutations belong to modules/rsvp. Thin versioned handlers delegate to these modules. Shared wedding transactions serialize guest, family, link and response changes while revalidating authenticated access. Public requests derive tenant and party from an active hashed token, not caller-supplied tenant IDs. Named companions become individual guest records; no anonymous headcount or guest accounts are introduced.
+
+Guest links are copied/shared without email delivery in this slice, are explicitly replaceable/revocable, and have no automatic expiry. Archive invalidates access; restore never silently revives a token. Public DTOs omit private contacts/notes and unrelated guest data. MongoDB per-token limits supplement required trusted-edge/WAF limits before deployment. Photo customization, invitation email distribution, and production load certification remain follow-up work.

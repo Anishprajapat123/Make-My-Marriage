@@ -1,6 +1,6 @@
 import "server-only";
 import { AccessError, type TenantContext } from "@/lib/tenant/context";
-import { sendTransactionalEmail } from "@/lib/email/ses";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import { memberRepository as repo } from "./member.repository";
 import {
   editMemberSchema,

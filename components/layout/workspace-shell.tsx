@@ -63,6 +63,7 @@ function NavigationItems({
             label === "Events" ||
             label === "Tasks" ||
             label === "Guests" ||
+            label === "Invitations" ||
             label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
@@ -74,9 +75,11 @@ function NavigationItems({
                       ? "/tasks"
                       : label === "Guests"
                         ? "/guests"
-                        : label === "Members"
-                          ? "/members"
-                          : "/dashboard"
+                        : label === "Invitations"
+                          ? "/invitations"
+                          : label === "Members"
+                            ? "/members"
+                            : "/dashboard"
                 }
                 key={label}
               >

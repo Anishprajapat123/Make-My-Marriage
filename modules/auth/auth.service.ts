@@ -2,7 +2,7 @@ import "server-only";
 import argon2 from "argon2";
 import { createHash, randomBytes } from "node:crypto";
 import { connectToDatabase } from "@/lib/db/mongoose";
-import { sendTransactionalEmail } from "@/lib/email/ses";
+import { sendTransactionalEmail } from "@/lib/email/send";
 import { AuthTokenModel } from "./auth-token.model";
 import {
   credentialsSchema,

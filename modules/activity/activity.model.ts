@@ -3,7 +3,8 @@ import { Schema, model, models } from "mongoose";
 const activitySchema = new Schema(
   {
     tenantId: { type: Schema.Types.ObjectId, required: true },
-    actorMemberId: { type: Schema.Types.ObjectId, required: true },
+    actorMemberId: { type: Schema.Types.ObjectId, default: null },
+    actorGuestId: { type: Schema.Types.ObjectId, default: null },
     action: { type: String, required: true },
     resourceType: { type: String, required: true },
     resourceId: { type: Schema.Types.ObjectId, required: true },

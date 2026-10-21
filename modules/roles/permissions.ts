@@ -77,6 +77,7 @@ export const DEFAULT_WEDDING_ROLES = [
     description: "Planning visibility and issue reporting.",
     permissionKeys: [
       ...VIEWER_PERMISSION_KEYS,
+      "VIEW_EVENTS",
       "VIEW_ASSIGNED_TASKS",
       "UPDATE_ASSIGNED_TASKS",
     ],

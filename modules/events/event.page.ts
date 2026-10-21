@@ -1,5 +1,5 @@
 import "server-only";
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { requireTenant, AccessError } from "@/lib/tenant/context";
 export async function eventPageContext(permission = "VIEW_EVENTS") {
   try {
@@ -8,7 +8,7 @@ export async function eventPageContext(permission = "VIEW_EVENTS") {
     if (e instanceof AccessError) {
       if (e.status === 401) redirect("/login");
       if (e.code === "NO_WORKSPACE") redirect("/onboarding");
-      notFound();
+      return null;
     }
     throw e;
   }

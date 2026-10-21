@@ -18,7 +18,7 @@ vi.mock("@/modules/members/member.repository", () => ({
     invitation: mocks.invitation,
   },
 }));
-vi.mock("@/lib/email/ses", () => ({ sendTransactionalEmail: mocks.send }));
+vi.mock("@/lib/email/send", () => ({ sendTransactionalEmail: mocks.send }));
 import { mayGrant, isOwner } from "@/modules/members/member.policy";
 import {
   inviteMember,

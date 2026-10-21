@@ -1,5 +1,7 @@
 # Make My Marriage
 
+Temporary free hosting setup: see [Vercel + Brevo deployment](docs/FREE_DEPLOYMENT.md).
+
 Next.js modular-monolith application for the Make My Marriage project. The
 current implementation includes the responsive dashboard preview and an
 initial account-authentication foundation: local registration with email
@@ -124,7 +126,11 @@ their details. Moving/archiving a family primary contact clears that selection.
 Families can be deleted only when empty of both active and archived records.
 No email, guest account, guest link, import, export, or RSVP behavior is added by
 this slice. Existing MongoDB configuration is used; no new dependency is required.
-Live guest-flow verification remains pending. No sample guest data is inserted.
+The first slice passes automated development verification, including isolated
+browser/database lifecycle, permissions, tenant isolation and 1,000-guest pagination
+checks. See [docs/GUESTS_QA_REVIEW.md](docs/GUESTS_QA_REVIEW.md) for scope and rerun
+instructions. No sample guest data is inserted; QA fixtures are temporary and
+cleaned afterward. Production/load acceptance remains separate.
 
 ## Members and collaborator invitations
 
@@ -167,3 +173,15 @@ The real SES check requires the additional explicit `RUN_REAL_SES_MEMBER_QA=1`
 opt-in and separate approval to send its single test email to the fixed test
 recipient. Keep it disabled during ordinary reruns. Test credentials are random,
 remain in memory, and generated records are cleaned in `finally`.
+
+## Guest invitations and RSVP
+
+Open `/invitations` as a member with MANAGE_INVITATIONS. Save the invitation content and explicitly publish it, then create and copy each guest's individual link. Links are shown only when issued or replaced; replacement invalidates the old link. This slice does not send guest invitation emails. RSVP totals require VIEW_RSVP.
+
+Guests open their link without signing in, view published events, and respond with named companions. Every companion is an individual guest record. Unselected companions remain recorded as declined. Archiving a primary guest revokes their link; restore does not reactivate it.
+
+Restart an already-running development server once after updating this feature so cached Mongoose models load the new fields. Family Member defaults now include read-only Events. For other existing weddings, preview `node --env-file=.env.local scripts/migrate-family-event-access.mjs --tenant=<wedding-id>` and add `--apply` only for the intended wedding. The current owner's wedding has already been updated.
+
+Before deployment, configure trusted-edge/WAF rate limits for public endpoints. The application also applies MongoDB-backed per-token limits, which do not replace protection against random-token traffic.
+
+Invitation QA (temporary development records, no email): build, set `RUN_INVITATIONS_LIVE_QA=1`, then run `npm run test:e2e -- --config playwright.invitations.config.ts`.

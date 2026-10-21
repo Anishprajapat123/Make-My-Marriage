@@ -2790,3 +2790,16 @@ This API design is based on the approved:
 - MongoDB Database Design
 
 It is the baseline for implementation. Any future API change should be reviewed against tenant isolation, permission boundaries, guest simplicity, and the modular-monolith architecture before implementation.
+
+## Implemented guest invitation / RSVP contract — 21 October 2026
+
+This slice supersedes anonymous attendee-count inputs: companions are named individual guest records. Collaborator invitations remain a separate seven-day authenticated flow.
+
+- `/api/v1/invitations`: GET configuration, POST save full configuration; PATCH `/api/v1/invitations/[invitationId]` also saves. Fields: title, welcomeMessage, story, language (en/hi), published, revision (null on creation). MANAGE_INVITATIONS required.
+- POST `/api/v1/invitations/guest-links`: guestId, action ISSUE/REPLACE/REVOKE, revision (null on issue). Returns the raw URL only on issue/replace. No email delivery implied. Links do not expire automatically.
+- GET `/api/v1/invitations/status`: paginated host link list, MANAGE_INVITATIONS. GET `/api/v1/rsvp` and `/api/v1/rsvp/stats`: VIEW_RSVP. Response data is masked for managers lacking VIEW_RSVP.
+- GET `/api/v1/public/invitations/[token]`: safe linked-party DTO and published events only. Config must be published, guest active, link active, and public wedding access enabled. Invalid/revoked/unpublished access returns generic 410.
+- POST/PATCH `/api/v1/public/invitations/[token]/rsvp`: attendance YES/NO, revision, UUID requestId, companions [{clientId UUID,name,guestType COMPANION/CHILD}], optional duplicateConfirmation. NO has no attending companions. At most 10 attending companions and 20 retained companion records per primary prevent unbounded public creation. Companion records cannot recursively add companions.
+- Retry the same requestId and body safely; changed body or stale revision returns 409. Possible duplicates return generic COMPANION_REVIEW_REQUIRED with a server-validated confirmation fingerprint, never unrelated guest identities.
+- Removing a companion from attendance records NO; host-managed names are not overwritten. Counts derive individual active guests, not sums of partySize. Archive revokes a guest's link transactionally; restore needs explicit replacement.
+- Public per-token limits: 120 reads/minute and 20 writes/minute, with 429/Retry-After. Configure edge rate limiting before release. All public invitation responses are no-store and no-referrer.

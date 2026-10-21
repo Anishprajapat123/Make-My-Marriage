@@ -1,5 +1,7 @@
+import { withWeddingTransaction } from "@/lib/db/wedding-transaction";
+import { revokeArchivedGuestLinks } from "@/modules/invitations/invitation.lifecycle";
 import "server-only";
-import mongoose, { Types, type ClientSession } from "mongoose";
+import { Types, type ClientSession } from "mongoose";
 import { createHash } from "node:crypto";
 import {
   GuestModel as Guest,
@@ -7,8 +9,6 @@ import {
   type GuestRecord,
   type FamilyRecord,
 } from "./guest.model";
-import { MemberModel } from "@/modules/members/member.model";
-import { RoleModel } from "@/modules/roles/role.model";
 import { AccessError, type TenantContext } from "@/lib/tenant/context";
 import { appendActivity } from "@/modules/activity/activity.repository";
 import type { GuestInput, FamilyInput, GuestQuery } from "./guest.schema";
@@ -39,63 +39,14 @@ export class GuestDuplicateError extends AccessError {
     );
   }
 }
-async function write<T>(
+const write = <T>(
   ctx: TenantContext,
   operation: (session: ClientSession) => Promise<T>,
-) {
-  const session = await mongoose.startSession();
-  try {
-    return await session.withTransaction(async () => {
-      const member = await MemberModel.findOne({
-        _id: ctx.memberId,
-        tenantId: ctx.tenantId,
-        membershipStatus: "ACTIVE",
-      })
-        .session(session)
-        .lean();
-      if (!member)
-        throw new AccessError(
-          403,
-          "FORBIDDEN",
-          "Active guest management access is required.",
-        );
-      const roles = await RoleModel.find({
-        tenantId: ctx.tenantId,
-        _id: { $in: member.roleIds },
-      })
-        .session(session)
-        .lean();
-      if (!roles.some((r) => r.permissionKeys.includes("MANAGE_GUESTS")))
-        throw new AccessError(
-          403,
-          "FORBIDDEN",
-          "Guest management permission is required.",
-        );
-      await MemberModel.collection.updateOne(
-        {
-          _id: new Types.ObjectId(ctx.memberId),
-          tenantId: new Types.ObjectId(ctx.tenantId),
-        },
-        { $inc: { accessVersion: 1 } },
-        { session },
-      );
-      // Serialize guest/family writes per wedding: duplicate checks and family references
-      // must observe the result of any concurrent mutation before committing.
-      const wedding = await mongoose.connection
-        .collection("weddings")
-        .updateOne(
-          { _id: new Types.ObjectId(ctx.tenantId) },
-          { $inc: { guestWriteVersion: 1 } },
-          { session },
-        );
-      if (!wedding.matchedCount)
-        throw new AccessError(404, "NOT_FOUND", "Wedding unavailable.");
-      return operation(session);
-    });
-  } finally {
-    await session.endSession();
-  }
-}
+) =>
+  withWeddingTransaction(ctx.tenantId, operation, {
+    ctx,
+    permission: "MANAGE_GUESTS",
+  });
 async function audit(
   ctx: TenantContext,
   id: string,
@@ -423,6 +374,8 @@ export const guestRepository = {
         { session, returnDocument: "after" },
       ).lean();
       if (!row) conflict();
+      if (status === "ARCHIVED")
+        await revokeArchivedGuestLinks(ctx.tenantId, id, session);
       if (status === "ARCHIVED")
         await Family.updateMany(
           { tenantId: ctx.tenantId, primaryContactGuestId: row._id },

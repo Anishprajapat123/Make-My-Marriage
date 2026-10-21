@@ -4,6 +4,29 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Deployment decision update (21 October 2026): user chose AWS SES instead of Brevo.
+Explicit EMAIL_PROVIDER=ses now works on Vercel; removed the earlier SES block.
+Vercel hosting remains Hobby, but AWS email is not guaranteed free. Hosted AWS
+authentication, SES sandbox status and final URL must be verified before launch.
+
+Temporary Vercel deployment preparation (21 October 2026): user approved Hobby
+hosting and a free email provider. Added a dependency-free Brevo adapter for auth
+and collaborator email, with explicit provider selection and no SES fallback.
+SES is rejected on Vercel. Local SES remains available. Lint/type checking pass.
+Deployment awaits access to the signed-in browser, verified Brevo sender/key,
+Atlas free-tier verification and hosted security checks. See FREE_DEPLOYMENT.md.
+No live deployment, email send, commit or push was performed in this step.
+
+Guests verification (21 October 2026): 73 unit/security/component checks pass,
+including validation/service coverage and both UI review regressions. The live
+production-server journey passes with isolated owner, read-only, denied, suspended
+and foreign-wedding sessions. Verified guest/family CRUD, duplicate confirmation,
+primary-contact clearing, archive/restore, stale edits, list error/retry, pagination
+with 1,000 seeded guests, and desktop/tablet/mobile overflow/screenshots. Temporary
+QA accounts/weddings/guests/families were cleaned and absence asserted. Email was
+disabled; no personal wedding data was changed. See GUESTS_QA_REVIEW.md for limits
+and rerun instructions. Production/load certification remains separate.
+
 Guests review fixes (21 October 2026): clicking the active tab is now a no-op,
 preventing a loading state without a matching fetch. New-guest editor keys include
 the target family, so switching Add person between households resets the draft
@@ -92,7 +115,7 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 - `[~]` Events and wedding timeline implemented: responsive list/search/status filters, create/edit, details, venue and guest guidance, timeline CRUD, tenant/permission checks, overnight scheduling, stale-write checks, and linked-record delete protection. Live verified-owner Atlas/browser journey passes at desktop/tablet/mobile widths; two-account isolation, fresh onboarding, and final user visual acceptance remain separate checks. Event reminders and public schedule delivery belong to later slices.
 - `[x]` Tasks first slice implemented and verified in development: list/filter/counts, create/edit/details, assignments, timezone deadlines, bounded checklists, planner comments, audit history, assigned-task scope, and revisions. Live Atlas/Playwright checks use two temporary weddings and planner/family sessions, including suspended access, stale writes, foreign/inactive references, linked-event deletion, and error recovery. Desktop/tablet/mobile screenshots have no horizontal overflow. Templates/boards/task notifications and production/load/concurrency acceptance remain later work.
-- `[~]` Guest/family first slice implemented: individual records, responsive ledger/forms/details, paginated search/filter/sort, data-driven counts, duplicate review/keep-both, archive/restore, family/contact management, versioned tenant-scoped APIs and transactional activity. Lint/typecheck/format/build pass; live browser/database and permission/isolation verification is pending. Import preview/commit, export, guest links and RSVP are later increments.
+- `[x]` Guest/family first slice implemented and verified in development: individual records, responsive ledger/forms/details, paginated search/filter/sort, data-driven counts, duplicate review/keep-both, archive/restore, family/contact management, versioned tenant-scoped APIs and transactional activity. Unit/component/security checks and isolated live browser/database access/tenant checks pass; see GUESTS_QA_REVIEW.md. Import preview/commit, export, guest links and RSVP are later increments; production/load acceptance remains separate.
 - `[ ]` Issues: reporting, status/assignment, comments, and activity history.
 - `[ ]` Activity log for important workspace changes.
 
@@ -170,3 +193,11 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - Wedding onboarding UI and API added. Wedding, default system role templates, and the owner membership are created atomically; the dashboard shows the current wedding identity while keeping preview metrics labeled as sample data.
 - Family Member defaults no longer grant wedding-wide event, task, guest, or RSVP visibility. Current wedding resolution now combines permissions from all tenant-scoped roles assigned to a member.
 - Wedding description, couple/cover image, contact information, hashtag, and theme editing remain follow-up wedding profile work; only the fields in the onboarding API contract are collected in this slice.
+
+## 21 October 2026 — guest invitations and RSVP
+
+- Implemented invitation content/publishing, individual copyable guest links, explicit replacement/revocation, public published-event schedule, and no-account RSVP with named companions.
+- Added host response counts, party-scoped public data, stale-write protection, idempotent retries, duplicate confirmation, and archive-triggered link revocation.
+- Family Member now receives read-only Events; unauthorized routes show an access explanation instead of a misleading 404. Applied VIEW_EVENTS only to the current owner's wedding system role.
+- Guests first-slice QA completed with 73 checks and a 1,000-guest live journey; invitation live verification is recorded separately in INVITATIONS_QA_REVIEW.md.
+- No deployment, commit, push, new dependency, or guest email sending in this step.

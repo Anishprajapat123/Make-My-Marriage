@@ -21,7 +21,8 @@ family deletion until guests are reassigned/ungrouped. Refined desktop screen
 implements their ledger/card direction with functional forms and states in the
 existing workspace shell. The decisions section below records the original review;
 the implemented contracts are now documented in the API design and build tracker.
-Guest-flow live acceptance remains pending.
+Guest-flow automated live development verification passed on 21 October 2026;
+see GUESTS_QA_REVIEW.md for coverage and remaining production/manual acceptance.
 
 ## Paste into the existing Make My Marriage Platform Stitch project
 

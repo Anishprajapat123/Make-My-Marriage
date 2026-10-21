@@ -2123,3 +2123,11 @@ The database design is ready for implementation when the development team can an
 - Can production data remain available after the wedding without TTL deletion?
 
 If all answers are yes, the MongoDB design is aligned with the approved Make My Marriage product and system architecture.
+
+## Invitation / RSVP implementation additions — 21 October 2026
+
+Invitation content uses one invitations record per tenant with published/revision fields. invitation_links has unique tokenHash and unique tenantId+guestId, lifecycle revision, rsvpRevision, and private lastRequestId/lastRequestHash for retry safety. Only hashes are stored; replacement rotates the hash in the retained link record. No TTL applies to guest links.
+
+rsvps has unique tenantId+guestId and individual YES/NO/PENDING response; partySize is informational and never summed for total guest counts. Public companions are guests with source GUEST_RSVP, addedByGuestId, and private rsvpClientId; a partial unique tenantId+addedByGuestId+rsvpClientId index prevents duplicate retry creation. Existing guest/family references remain tenant scoped.
+
+Activity may use actorGuestId with nullable actorMemberId for genuine no-account RSVP attribution. public_rate_limits stores hashed token/scope/minute keys and a short expiresAt TTL, never raw bearer tokens. Wedding guestWriteVersion serializes guest/family/invitation/RSVP transactions; authenticated writes revalidate member permission inside the transaction.

@@ -35,6 +35,15 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
+- Latest deployment decision: user selected AWS SES instead of Brevo. Allow
+  explicit EMAIL_PROVIDER=ses on Vercel; this supersedes the earlier SES block
+  below. Hobby hosting stays free-tier; do not promise AWS email is free.
+
+- Temporary deployment approved on Vercel Hobby with Brevo Free for transactional
+  account/member email. Never enable paid plans/trials/top-ups. Reject SES on
+  Vercel and never fall back to it; local SES remains supported. Keep the Docker
+  and AWS deployment direction for later use. Follow docs/FREE_DEPLOYMENT.md.
+
 - The product is free. Do not add SaaS billing, subscriptions, freemium tiers, or premium entitlements.
 - V1 includes in-app notifications/reminders for authenticated members. Guest reminders and WhatsApp are Phase 2; use email only where the approved documents require it (such as account/security flows).
 - Use S3 for original, optimized, and thumbnail photo objects; MongoDB stores metadata and object references. Upload authorization and completion must be server-verified.
@@ -48,3 +57,9 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 - Add only dependencies needed for the approved feature. Avoid speculative infrastructure and duplicated domain logic.
 - Do not commit or push unless the user explicitly requests it.
 - Follow the repository scripts for linting, type checking, formatting, and production builds when validation is requested or needed for the change. Add/run tests when requested or when the task explicitly requires test verification.
+
+## Approved guest invitation and Events follow-up
+
+- Family Member has VIEW_EVENTS for the full workspace schedule, without MANAGE_EVENTS. Existing system roles use an explicit tenant-scoped migration; never silently migrate every wedding.
+- Guest invitations are separate from seven-day collaborator invitations. Public guest links are opaque hashed bearer tokens, explicitly replaceable/revocable, with no automatic expiry. Archiving a guest revokes their link; restoring the guest does not reactivate it.
+- Guests RSVP without accounts and may add named companions as individual guest records. Public responses expose only the linked party and published events, never the guest directory or private contact/notes. Enforce revision checks, retry idempotence, bounded companions, and explicit duplicate confirmation on the server.

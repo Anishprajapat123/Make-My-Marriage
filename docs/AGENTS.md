@@ -24,6 +24,16 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
+- Latest user decision supersedes the Brevo-only deployment rule below: use AWS
+  SES with EMAIL_PROVIDER=ses on Vercel. Verify credentials and sandbox status;
+  AWS email may incur charges. Do not enable paid Vercel plans or add-ons.
+
+- Temporary Vercel Hobby + Brevo Free deployment is approved. Account/security
+  and member-invitation email may use Brevo for this deployment. Do not enable
+  paid trials, top-ups, or SES fallback on Vercel. Local SES remains supported;
+  the longer-term AWS/Docker direction remains documented. Confirm real sender
+  activation, free-tier limits and hosted security before declaring launch ready.
+
 - V1 notifications and reminders are in-app for authenticated members. Guest reminders and WhatsApp are Phase 2. Email is only for flows explicitly approved in the API and product documents.
 - Store photo/document objects in S3 and their metadata/references in MongoDB. Gallery uploads use original, optimized, and thumbnail variants; authorize uploads and verify completion server-side.
 - Use an external livestream provider initially. Do not build video hosting infrastructure.
@@ -39,3 +49,7 @@ This file is the project-specific development guide. The four design documents i
 - Keep [`BUILD_TRACKER.md`](BUILD_TRACKER.md) current as work is completed. Distinguish UI previews from implemented features, and update this guide and the root `AGENTS.md` when the user approves lasting product, architecture, or workflow decisions.
 - Use the existing package scripts for lint, formatting, type checking, and build validation when requested or appropriate. Add/run tests when the user requests them or the task explicitly requires test verification.
 - Never commit or push unless the user explicitly asks.
+
+## Approved invitation / RSVP follow-up
+
+Family Member may read the full workspace Events schedule but cannot mutate events. Guest invitation links and RSVP are now an implemented slice, separate from collaborator invitations. Guest tokens have no automatic expiry; replacement/revocation and guest archive invalidate access. Restore requires an explicit new link. Guests need no account and can add named companions as individual records. Preserve party isolation, published-event-only public DTOs, hashed tokens, revision checks, idempotent retries, and duplicate confirmation. Do not expose private guest contacts, notes, or unrelated guests. Guest invitation links are copied/shared in this slice; no guest email delivery is claimed.
