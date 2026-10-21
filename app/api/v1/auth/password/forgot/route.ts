@@ -1,7 +1,15 @@
 import { errorResponse, successResponse } from "@/lib/http/responses";
 import { requestPasswordReset } from "@/modules/auth/auth.service";
+import { emailConfigured } from "@/lib/email/config";
 
 export async function POST(request: Request) {
+  if (!emailConfigured()) {
+    return errorResponse(
+      "SERVICE_UNAVAILABLE",
+      "Password reset emails are temporarily unavailable. Google accounts should use Continue with Google.",
+      503,
+    );
+  }
   let input: unknown;
   try {
     input = await request.json();

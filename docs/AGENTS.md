@@ -24,15 +24,18 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
-- Latest user decision supersedes the Brevo-only deployment rule below: use AWS
-  SES with EMAIL_PROVIDER=ses on Vercel. Verify credentials and sandbox status;
-  AWS email may incur charges. Do not enable paid Vercel plans or add-ons.
+- Selected self-service demo path: direct Google OAuth via existing Auth.js,
+  basic identity scopes, no paid identity platform or silent local-account linking.
+  Preserve existing local verified users. Unconfigured email signup/reset returns
+  a global unavailable response before account lookup and has matching UI states.
+  OAuth client creation is an owner setup prerequisite, not per-visitor approval.
 
-- Temporary Vercel Hobby + Brevo Free deployment is approved. Account/security
-  and member-invitation email may use Brevo for this deployment. Do not enable
-  paid trials, top-ups, or SES fallback on Vercel. Local SES remains supported;
-  the longer-term AWS/Docker direction remains documented. Confirm real sender
-  activation, free-tier limits and hosted security before declaring launch ready.
+- Strict zero-budget demo supersedes the earlier SES approval. No paid trials,
+  top-ups, overage billing or paid resources. Paid email is disabled locally and
+  on Vercel, with no SES fallback. A free provider must have a verified sender
+  and active Free account before use. Preserve verified-email authentication;
+  do not auto-verify accounts to compensate for unavailable email. Confirm Atlas
+  is Free and Vercel remains Hobby. AWS/S3 architecture is future direction only.
 
 - V1 notifications and reminders are in-app for authenticated members. Guest reminders and WhatsApp are Phase 2. Email is only for flows explicitly approved in the API and product documents.
 - Store photo/document objects in S3 and their metadata/references in MongoDB. Gallery uploads use original, optimized, and thumbnail variants; authorize uploads and verify completion server-side.

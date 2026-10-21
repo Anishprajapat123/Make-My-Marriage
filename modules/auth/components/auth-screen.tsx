@@ -308,11 +308,13 @@ export function AuthScreen({
   variant,
   token = "",
   googleEnabled = false,
+  emailEnabled = true,
   returnTo = "/dashboard",
 }: {
   variant: AuthScreenVariant;
   token?: string;
   googleEnabled?: boolean;
+  emailEnabled?: boolean;
   returnTo?: "/dashboard" | "/join";
 }) {
   const router = useRouter();
@@ -322,6 +324,7 @@ export function AuthScreen({
   const isForgotPassword = variant === "forgot-password";
   const isVerifyEmail = variant === "verify-email";
   const isResetPassword = variant === "reset-password";
+  const emailUnavailable = !emailEnabled && (isRegister || isForgotPassword);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -406,7 +409,13 @@ export function AuthScreen({
       return;
     }
     setPending(true);
-    await signIn("google", { redirectTo: returnTo });
+    setError("");
+    try {
+      await signIn("google", { redirectTo: returnTo });
+    } catch {
+      setError("Google sign-in could not start. Please try again.");
+      setPending(false);
+    }
   }
 
   return (
@@ -423,7 +432,9 @@ export function AuthScreen({
             <p>{content.description}</p>
           </div>
 
-          {isLogin || isRegister ? <VerificationNotice /> : null}
+          {isLogin || (isRegister && emailEnabled) ? (
+            <VerificationNotice />
+          ) : null}
 
           {!isForgotPassword && !isVerifyEmail && !isResetPassword ? (
             <>
@@ -440,19 +451,30 @@ export function AuthScreen({
                   ? "Continue with Google"
                   : "Google sign-in unavailable"}
               </button>
-              <div aria-hidden="true" className={styles.separator}>
-                <span />
-                <span>or use your email</span>
-                <span />
-              </div>
+              {!emailUnavailable && (
+                <div aria-hidden="true" className={styles.separator}>
+                  <span />
+                  <span>or use your email</span>
+                  <span />
+                </div>
+              )}
             </>
           ) : null}
 
           <div className={styles.fields}>
+            {emailUnavailable ? (
+              <p className={styles.formHint} role="status">
+                {isRegister
+                  ? googleEnabled
+                    ? "Create your account with Google. No separate app password or verification email is needed."
+                    : "New account signup is temporarily unavailable. Existing users can still sign in."
+                  : "Password reset emails are temporarily unavailable. If you created your account with Google, return to sign in and choose Continue with Google."}
+              </p>
+            ) : null}
             <form onSubmit={handleSubmit}>
               {isLogin ? <LoginFields /> : null}
-              {isRegister ? <RegisterFields /> : null}
-              {isForgotPassword ? <RecoveryFields /> : null}
+              {isRegister && emailEnabled ? <RegisterFields /> : null}
+              {isForgotPassword && emailEnabled ? <RecoveryFields /> : null}
               {isVerifyEmail ? <VerifyEmailFields token={token} /> : null}
               {isResetPassword ? <ResetPasswordFields token={token} /> : null}
               {error ? (

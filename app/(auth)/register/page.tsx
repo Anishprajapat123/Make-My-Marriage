@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthScreen } from "@/modules/auth/components/auth-screen";
 import { cookies } from "next/headers";
+import { emailConfigured } from "@/lib/email/config";
 import {
   MEMBER_INVITATION_COOKIE,
   validMemberToken,
@@ -20,6 +21,7 @@ export default async function RegisterPage() {
     <AuthScreen
       returnTo={validMemberToken(invitation) ? "/join" : "/dashboard"}
       googleEnabled={googleEnabled}
+      emailEnabled={emailConfigured()}
       variant="register"
     />
   );

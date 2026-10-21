@@ -1,14 +1,14 @@
 import "server-only";
-import { sendTransactionalEmail as sendSesEmail } from "./ses";
 
 type Message = { to: string; subject: string; text: string };
 
 /** Explicit provider selection: a free-provider failure must never fall back to SES. */
 export async function sendTransactionalEmail(message: Message) {
-  const provider =
-    process.env.EMAIL_PROVIDER ?? (process.env.VERCEL ? "disabled" : "ses");
+  const provider = process.env.EMAIL_PROVIDER ?? "disabled";
   if (provider === "ses") {
-    return sendSesEmail(message);
+    throw new Error(
+      "Paid email sending is disabled for this zero-budget demo.",
+    );
   }
   if (provider !== "brevo") {
     throw new Error("Transactional email provider is not configured.");

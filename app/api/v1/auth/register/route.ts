@@ -1,7 +1,15 @@
 import { errorResponse, successResponse } from "@/lib/http/responses";
 import { registerLocalAccount } from "@/modules/auth/auth.service";
+import { emailConfigured } from "@/lib/email/config";
 
 export async function POST(request: Request) {
+  if (!emailConfigured()) {
+    return errorResponse(
+      "SERVICE_UNAVAILABLE",
+      "Email signup is temporarily unavailable. Use Google sign-in when available.",
+      503,
+    );
+  }
   let input: unknown;
   try {
     input = await request.json();

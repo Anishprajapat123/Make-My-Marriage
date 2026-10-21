@@ -35,14 +35,21 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
-- Latest deployment decision: user selected AWS SES instead of Brevo. Allow
-  explicit EMAIL_PROVIDER=ses on Vercel; this supersedes the earlier SES block
-  below. Hobby hosting stays free-tier; do not promise AWS email is free.
+- Google OAuth through Auth.js is the chosen first self-service signup option
+  for the zero-budget demo. Use basic identity scopes only; no billable identity
+  service or automatic provider linking. Keep local verified-password accounts
+  working. Email signup/reset must show unavailable states while free email is
+  unconfigured; never send users into fake email-success flows. See
+  docs/GOOGLE_SIGN_IN_SETUP.md for the pending one-time owner setup.
 
-- Temporary deployment approved on Vercel Hobby with Brevo Free for transactional
-  account/member email. Never enable paid plans/trials/top-ups. Reject SES on
-  Vercel and never fall back to it; local SES remains supported. Keep the Docker
-  and AWS deployment direction for later use. Follow docs/FREE_DEPLOYMENT.md.
+- Strict zero-budget learning/demo project: use only free services without paid
+  trials, upgrades, top-ups or overage billing. This supersedes earlier approval
+  to send through SES. Keep paid email disabled locally and on Vercel; never
+  fall back to SES. A free provider requires account/sender verification before
+  enabling email. Preserve verified-email sign-in; never auto-verify accounts.
+  Keep Vercel on Hobby and confirm Atlas is Free before promising zero cost.
+  AWS/S3/Docker remain future architecture directions, not permission to incur
+  charges. Follow docs/FREE_DEPLOYMENT.md.
 
 - The product is free. Do not add SaaS billing, subscriptions, freemium tiers, or premium entitlements.
 - V1 includes in-app notifications/reminders for authenticated members. Guest reminders and WhatsApp are Phase 2; use email only where the approved documents require it (such as account/security flows).

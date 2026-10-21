@@ -1,6 +1,35 @@
 # Temporary public deployment: Vercel Hobby + Brevo Free
 
+## Current policy: strict zero budget
+
+Google sign-in credentials are now configured privately in production and its
+authorization start is verified. Full callback acceptance remains pending. User
+confirmed Atlas Free/M0 on 21 October 2026; this is user-reported tier confirmation,
+not a full MongoDB/AWS billing audit. The app still uses Vercel Hobby and no paid
+email delivery. Prior setup history below includes superseded pending states.
+
+The latest user decision supersedes all SES approval recorded below. This is a
+learning/idea demo; no paid service, trial, upgrade, top-up or overage is permitted.
+Dedicated SES keys are inactive and removed from Vercel. EMAIL_PROVIDER=disabled
+is the deployment setting; the adapter rejects SES and defaults disabled locally.
+No free-provider account or live email delivery is verified yet. Existing verified
+users can sign in and guest invitation/RSVP needs no email. New registrations
+cannot complete verification, password-reset emails are unavailable, and member
+invitations must use their issuance copy link until free email is configured.
+Never bypass email verification or claim email was sent when disabled.
+
+Vercel is Hobby. Atlas Free status and unrelated account charges have not been
+verified: disabling this project's SES does not certify the entire AWS account
+or MongoDB account has zero charges. Prior deployment history below is retained.
+
 ## Superseding decision — AWS SES
+
+Production website: https://make-my-marriage-sepia.vercel.app. The initial build
+completed successfully. Dedicated IAM user make-my-marriage-vercel-ses is limited
+to ses:SendEmail for the verified sender in ap-south-2; key material exists only
+in Vercel Production. SES sandbox remains enabled. Do not claim arbitrary-recipient
+registration email delivery or $0 AWS billing. Production AUTH_SECRET is distinct
+from local development. .vercelignore excludes local environments and artifacts.
 
 The user subsequently chose AWS SES. The Brevo setup below is historical and is
 not required. Set EMAIL_PROVIDER=ses, AWS_REGION, SES_FROM_EMAIL and appropriate

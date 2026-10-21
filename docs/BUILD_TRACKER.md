@@ -4,6 +4,59 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Next-slice preparation (21 October 2026): user confirms live Google login reached
+onboarding/dashboard (user acceptance, not an automated callback test). Atlas is
+user-confirmed Free/M0. Google collaborator acceptance is still a separate pending
+journey; email remains intentionally disabled. Reviewed expense contracts and
+Stitch inventory; prepared EXPENSES_STITCH_PROMPT.md with mobile/state coverage and
+explicit budget/payment/money/removal contract gaps. No expense feature code or
+paid service was added. Recent deployment/Google changes are being saved to dev.
+
+Google deployment update (21 October 2026): credentials securely copied from
+ignored local configuration into Vercel Production; deployment READY. Hosted
+Continue with Google reaches Google's account sign-in page, requesting only
+openid/profile/email with the exact production callback. Lint, formatting,
+TypeScript and hosted build pass. User confirms Atlas Free/M0. Full interactive
+OAuth callback, onboarding and invitation acceptance still require a real Google
+sign-in; no completed login is claimed. Existing local emails are not silently
+linked to Google. Dedicated SES keys remain disabled; email delivery stays off.
+
+Google self-service preparation (21 October 2026): selected direct Google OAuth
+for the strict zero-budget demo. Existing Google provider/account foundation is
+present, but AUTH_GOOGLE_ID/SECRET are absent. Added explicit email-unavailable
+UI and registration/recovery API guards so disabled sending cannot create a false
+email-success journey. Added Google-start failure recovery and owner setup guide.
+Lint/TypeScript pass. OAuth credentials, hosted Google acceptance and public
+audience configuration remain required; do not mark the feature live/complete.
+
+Strict zero-budget decision (21 October 2026): user clarified this is a learning
+and idea demo with no paid services. Disabled the dedicated SES IAM keys (zero
+active keys verified), set production EMAIL_PROVIDER=disabled, and removed AWS
+credentials from Vercel. Email adapter now defaults disabled and rejects SES
+locally as well. Existing verified accounts and guest RSVP remain usable; new
+email verification/password resets require a configured free provider. No account
+verification bypass or automatic success behavior was introduced. Free-provider
+activation and Atlas billing-tier verification remain pending.
+
+Zero-budget safeguards redeployed successfully to the existing public URL.
+Verified production READY, login 200, database-backed invalid invitation 410,
+and absence of both AWS access-key variables in Vercel. Lint, TypeScript,
+formatting and hosted production build pass. No real emails sent. These follow-up
+changes are not committed/pushed yet.
+
+Vercel launch (21 October 2026): deployed production to
+https://make-my-marriage-sepia.vercel.app on the existing Hobby workspace. Added
+production-only environment settings and a fresh Auth.js secret. Created IAM user
+make-my-marriage-vercel-ses in verified account 291786456658, restricted to
+ses:SendEmail from the configured verified identity in ap-south-2. Its key pair is
+stored directly in Vercel, never in Git. SES remains sandbox-only; public sign-up
+email delivery is limited to verified recipients. No production-access request
+or real email send was performed. Initial anonymous login returns 200 and session
+API returns 401 as expected. Final base-URL redeployment is READY. Hosted login
+and registration return 200; protected Events redirects with 307; anonymous
+session returns 401; a database-backed invalid invitation returns generic 410.
+Full hosted account/email acceptance remains unverified.
+
 Deployment decision update (21 October 2026): user chose AWS SES instead of Brevo.
 Explicit EMAIL_PROVIDER=ses now works on Vercel; removed the earlier SES block.
 Vercel hosting remains Hobby, but AWS email is not guaranteed free. Hosted AWS
