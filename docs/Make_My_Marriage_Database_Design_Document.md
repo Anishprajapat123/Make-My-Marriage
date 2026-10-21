@@ -596,6 +596,11 @@ Groups guests into family/household units to help prevent missed people.
 
 Do not make the family name unique; two families may legitimately have the same displayed surname/name.
 
+First-slice implementation adds integer `revision` (default 0). Primary contacts
+must be active guests in the same family. Moving/archiving a primary contact
+clears it and increments the family revision transactionally. Delete a family
+only after all active/archived guests have been reassigned or ungrouped.
+
 ---
 
 # 15. `guests` Collection
@@ -641,6 +646,14 @@ name + phone suffix
 ```
 
 The system should warn before creating a probable duplicate rather than enforcing a unique phone-number constraint.
+
+Approved first slice: guest deletion means archive, with explicit restore and
+retained family/reference history. Guest documents add integer `revision` (default
+0), required for edit/archive/restore. Creation/edit duplicate warnings include
+archived records and exact normalized names/shared contact; explicit keep-both
+review is permitted. Fuzzy matching and merge are deferred. Mutations take a
+transactional `guestWriteVersion` increment on the owning wedding document to
+serialize guest/family writes and prevent concurrent reference/duplicate races.
 
 ## Indexes
 

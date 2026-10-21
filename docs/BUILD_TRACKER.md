@@ -2,7 +2,36 @@
 
 This tracker records what is built and what remains for the Make My Marriage V1. It follows the [PRD](<Make My Marriage — Product Requirements Document (PRD).md>), [System Design](Make_My_Marriage_System_Design_Document.md), [Database Design](Make_My_Marriage_Database_Design_Document.md), and [API Design](Make_My_Marriage_API_Design_Document.md). Those documents remain the source of truth if this checklist is incomplete or out of date.
 
-## Status key
+## Recent work
+
+Guests review fixes (21 October 2026): clicking the active tab is now a no-op,
+preventing a loading state without a matching fetch. New-guest editor keys include
+the target family, so switching Add person between households resets the draft
+and its family selection. Live guest-flow acceptance remains pending.
+Lint, type checking, formatting, and the production build pass after these fixes.
+
+Guests first slice (19 October 2026): implemented the refined Stitch desktop/mobile
+ledger direction, responsive guest/family screens and forms, guest details,
+paginated pickers/search/filters/sorting, duplicate review/keep-both, archive/restore,
+and family/contact management. APIs use tenant/permission checks, revisions,
+transactional reference guards and activity. The user approved archive/restore,
+explicit keep-both, and blocking deletion of populated families. No sample data
+was inserted. Live database/browser verification is still pending; do not treat
+compilation as acceptance of every workflow. Import, links, RSVP and merge remain
+separate increments.
+Lint, TypeScript, formatting and the production build pass. No guest-flow tests
+or live fixture runs were added or executed in this implementation step.
+
+Guests design review (19 October 2026): reviewed all four source documents and
+retrieved the existing Stitch guest preview/HTML. Refinement scope and unresolved
+lifecycle/duplicate/family policies are recorded in GUESTS_STITCH_PROMPT.md. Guest
+at that point had not started; the original design included excluded features.
+The user subsequently supplied refined desktop/mobile screens, used above.
+
+Invitation usability follow-up (19 October 2026): the acceptance page shows the
+signed-in account's own email, explains wrong-account recovery, hides ineffective
+retry for email mismatches, and switches directly to login after sign-out. The
+continue-to-workspace action dismisses the browser journey without accepting it.
 
 Review fixes (19 October 2026): Family Admin templates now include assigned-task
 permissions, with an explicit tenant-scoped migration option for existing system
@@ -11,6 +40,8 @@ terminal lookup errors clear the cookie, while wrong-account errors preserve it.
 No live role migration was applied automatically.
 Lint, TypeScript checking, formatting, and the production build pass after these
 review fixes. The earlier live QA results remain documented separately.
+
+## Status key
 
 - `[x]` Complete and verified for its stated scope.
 - `[~]` In progress.
@@ -61,7 +92,7 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 - `[~]` Events and wedding timeline implemented: responsive list/search/status filters, create/edit, details, venue and guest guidance, timeline CRUD, tenant/permission checks, overnight scheduling, stale-write checks, and linked-record delete protection. Live verified-owner Atlas/browser journey passes at desktop/tablet/mobile widths; two-account isolation, fresh onboarding, and final user visual acceptance remain separate checks. Event reminders and public schedule delivery belong to later slices.
 - `[x]` Tasks first slice implemented and verified in development: list/filter/counts, create/edit/details, assignments, timezone deadlines, bounded checklists, planner comments, audit history, assigned-task scope, and revisions. Live Atlas/Playwright checks use two temporary weddings and planner/family sessions, including suspended access, stale writes, foreign/inactive references, linked-event deletion, and error recovery. Desktop/tablet/mobile screenshots have no horizontal overflow. Templates/boards/task notifications and production/load/concurrency acceptance remain later work.
-- `[ ]` Guest and family management: individual guest records, duplicate checks, filtering/search, guest statistics, and import preview/commit for the expected wedding size.
+- `[~]` Guest/family first slice implemented: individual records, responsive ledger/forms/details, paginated search/filter/sort, data-driven counts, duplicate review/keep-both, archive/restore, family/contact management, versioned tenant-scoped APIs and transactional activity. Lint/typecheck/format/build pass; live browser/database and permission/isolation verification is pending. Import preview/commit, export, guest links and RSVP are later increments.
 - `[ ]` Issues: reporting, status/assignment, comments, and activity history.
 - `[ ]` Activity log for important workspace changes.
 

@@ -838,6 +838,14 @@ definitions.
 
 # 13. Wedding Invitation and Guest Access
 
+Guest-management first slice (19 October 2026): guest/family services live together
+in `modules/guests`, behind tenant/permission-checked versioned Route Handlers.
+Guest/family writes share a transactional wedding write counter, recheck manager
+access, validate family/contact references, and append activity. Guests use
+archive/restore; duplicate names/contact produce review and keep-both confirmation.
+Families cannot be deleted with active or archived guests. Import, guest links,
+and RSVP remain later increments; this UI does not expose those actions yet.
+
 Guests do not need accounts. The public experience is intentionally
 simple and mobile-first.
 

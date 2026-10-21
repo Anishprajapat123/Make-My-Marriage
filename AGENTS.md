@@ -31,6 +31,7 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 - Events use the server-resolved wedding timezone and optional end date/time. Store UTC instants; reject ambiguous/nonexistent daylight-saving times. Event and timeline mutations require the current version, and event deletion must preserve linked records.
 - Tasks: planners manage all tasks; family members see only their assigned tasks and may update status/checklists. Enforce assignment scope on the server when implementing this feature.
 - Guests do not create accounts. Public access is limited to explicitly designed wedding, invitation, RSVP, and livestream flows and must use the corresponding public token/lookup rules. Store only hashed invitation tokens where specified by the database design.
+- Guests first slice: archive/restore retains individual records; duplicate contacts/names trigger a tenant-scoped warning with explicit keep-both confirmation, never a unique-contact constraint or automatic merge. All guest/family mutations require revisions and MANAGE_GUESTS; reads require VIEW_GUESTS or MANAGE_GUESTS. Family deletion is blocked while any active or archived guest remains. Primary contacts must be active guests in the same family; moving/archiving them clears that reference transactionally.
 
 ## Product scope
 

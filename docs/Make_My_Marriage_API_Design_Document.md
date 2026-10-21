@@ -834,6 +834,54 @@ DELETE /api/v1/families/:familyId
 
 The API should not allow a family deletion to orphan guest records without explicit reassignment/null handling.
 
+### First-slice lifecycle contract (approved 19 October 2026)
+
+- Family/guest reads require server-resolved `VIEW_GUESTS` or `MANAGE_GUESTS`; writes
+  require `MANAGE_GUESTS`, rechecked inside the mutation transaction. All queries
+  and references are tenant-scoped. Guests remain separate from workspace members.
+- Guest/family lists use `page` (default 1), `limit` (default 25, maximum 50) and
+  return total counts. Family lists support `search`. Guest lists support `search`,
+  `familyId` (including `UNGROUPED`), `side`, `relationship`, `status`
+  (`ACTIVE`, `ARCHIVED`, `ALL`), `sortBy` (`name`, `createdAt`) and `sortOrder`.
+  Default guest status is ACTIVE; RSVP/invitation filters are deferred with those
+  modules. Guest counts reflect unfiltered tenant totals and are not attendance.
+- Guest create/edit fields: name (required, max 180), optional international phone
+  (leading +, country code, 7–15 digits; spaces/punctuation normalized), optional
+  normalized email (max 254), familyId, relationship (max 120), side, guestType and
+  private notes (max 2,000). Defaults: OTHER side, PRIMARY guestType, no family or
+  contact. Source is server-derived ADMIN for owners, otherwise MEMBER. Each person
+  has one guest record; household counts are derived from those records.
+- Guest/family PATCH preserves omitted fields and requires current integer
+  `revision`; stale or unavailable mutations return 409. Records start at revision 0.
+- Duplicate checks run before guest creation/editing, including archived matches.
+  Normalize names (Unicode/spacing/case), phone and email; exact normalized-name
+  or shared-contact matches produce 409 `POSSIBLE_DUPLICATE`, with up to ten safe
+  match summaries, reasons, and a `duplicateConfirmation` fingerprint. Resubmit
+  the same values with that confirmation only after explicit keep-both review.
+  The fingerprint covers normalized input and the checked match revisions; changed
+  input/matches require review again. This first slice does not perform fuzzy
+  spelling matching or automatic merge. Contact/family-name indexes are non-unique.
+- `DELETE /api/v1/guests/:guestId` accepts JSON `{ "revision": 0 }` and archives
+  rather than erases the record. `POST /api/v1/guests/:guestId/restore` accepts
+  `{ "revision": 1, "action": "RESTORE" }`. Restore before editing archived guests.
+  Neither action creates/reuses workspace accounts or sends an invitation.
+- Family create/edit accepts name (max 180), side, private notes (max 2,000), and
+  primaryContactGuestId. A primary contact must be an ACTIVE guest in this same
+  family. Create the family and its guests first, then select a contact. Clearing
+  the contact is allowed. Moving/archiving that guest clears the reference and
+  increments the family revision in the same transaction.
+- Family DELETE requires JSON revision and is blocked while any active/archived
+  guest remains; first reassign/ungroup those guests. Archived guests must be
+  restored before changing their family. No cascading deletion is performed.
+- Mutations serialize on a wedding write counter and record activity in the same
+  MongoDB transaction, protecting duplicate checks and family-reference updates.
+  Sensitive responses use no-store; JSON mutations use the shared origin check.
+- First UI slice is guest ledger/form/details, family households/forms/contact
+  selection, archive/restore, and duplicate review. CSV/Excel import, export, fuzzy
+  matching/merge, related-guests shortcut endpoint, guest invitations and RSVP are
+  follow-up increments. Future guest-link/RSVP lifecycle must reject archived
+  guests; restoring a guest must not automatically reactivate a revoked link.
+
 ---
 
 # 15. Guest APIs

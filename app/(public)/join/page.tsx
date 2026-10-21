@@ -7,5 +7,10 @@ export const metadata = {
 };
 export default async function JoinPage() {
   const session = await auth();
-  return <JoinScreen signedIn={Boolean(session?.user?.id)} />;
+  return (
+    <JoinScreen
+      signedIn={Boolean(session?.user?.id)}
+      signedInEmail={session?.user?.email ?? ""}
+    />
+  );
 }

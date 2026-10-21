@@ -31,7 +31,7 @@ const navigation = [
     items: [
       { label: "Events", icon: CalendarDays, active: false },
       { label: "Tasks", icon: CheckSquare, active: false },
-      { label: "Guests & RSVP", icon: UsersRound, active: false },
+      { label: "Guests", icon: UsersRound, active: false },
       { label: "Invitations", icon: Mail, active: false },
     ],
   },
@@ -62,6 +62,7 @@ function NavigationItems({
             active ||
             label === "Events" ||
             label === "Tasks" ||
+            label === "Guests" ||
             label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
@@ -71,9 +72,11 @@ function NavigationItems({
                     ? "/events"
                     : label === "Tasks"
                       ? "/tasks"
-                      : label === "Members"
-                        ? "/members"
-                        : "/dashboard"
+                      : label === "Guests"
+                        ? "/guests"
+                        : label === "Members"
+                          ? "/members"
+                          : "/dashboard"
                 }
                 key={label}
               >

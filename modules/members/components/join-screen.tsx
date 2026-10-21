@@ -4,7 +4,13 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import styles from "./members.module.css";
-export function JoinScreen({ signedIn }: { signedIn: boolean }) {
+export function JoinScreen({
+  signedIn,
+  signedInEmail = "",
+}: {
+  signedIn: boolean;
+  signedInEmail?: string;
+}) {
   const router = useRouter();
   const [data, setData] = useState<{
       accepted: boolean;
@@ -12,6 +18,7 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
       roles: string[];
     } | null>(null),
     [error, setError] = useState(""),
+    [errorCode, setErrorCode] = useState(""),
     [loading, setLoading] = useState(signedIn),
     [busy, setBusy] = useState(false),
     [revision, setRevision] = useState(0);
@@ -21,15 +28,21 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
     fetch("/api/v1/membership-invitation", { cache: "no-store" })
       .then(async (response) => {
         const body = await response.json();
-        if (!response.ok)
+        if (!response.ok) {
+          if (active) setErrorCode(body?.error?.code ?? "");
           throw new Error(body?.error?.message ?? "Unable to load invitation.");
+        }
         if (active) {
           setData(body.data);
           setError("");
+          setErrorCode("");
         }
       })
       .catch((e) => {
-        if (active) setError(e.message);
+        if (active) {
+          setData(null);
+          setError(e.message);
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -77,6 +90,15 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
       setBusy(false);
     }
   }
+  async function switchAccount() {
+    setBusy(true);
+    try {
+      await signOut({ redirectTo: "/login" });
+    } catch {
+      setError("Could not sign out. Please try again.");
+      setBusy(false);
+    }
+  }
   return (
     <main className={styles.join}>
       <p className={styles.eyebrow}>
@@ -87,6 +109,11 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
           ? "You’re part of the team."
           : "You’re invited to collaborate."}
       </h1>
+      {signedIn && signedInEmail && (
+        <p className={styles.muted}>
+          Signed in as <strong>{signedInEmail}</strong>
+        </p>
+      )}
       {!signedIn ? (
         <>
           <p className={styles.muted}>
@@ -113,7 +140,18 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
         <>
           {error && (
             <p className={styles.alert} role="alert">
-              {error}
+              {errorCode === "WRONG_ACCOUNT"
+                ? "This invitation was sent to a different email address. Switch account and sign in using the address that received the invitation."
+                : error}
+            </p>
+          )}
+          {errorCode === "WRONG_ACCOUNT" && (
+            <p className={styles.muted}>
+              If you are already the wedding owner, you do not need to accept a
+              collaborator invitation for your own workspace. Choose Continue to
+              my workspace below. If the invitation email was entered
+              incorrectly, ask the sender to revoke it and create one for the
+              correct address.
             </p>
           )}
           {data && !data.accepted && (
@@ -153,22 +191,24 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
           )}
           {!data?.accepted && (
             <div className={styles.actions}>
+              {errorCode !== "WRONG_ACCOUNT" && (
+                <button
+                  className={styles.secondary}
+                  disabled={busy}
+                  onClick={() => {
+                    setLoading(true);
+                    setRevision((v) => v + 1);
+                  }}
+                >
+                  Retry invitation
+                </button>
+              )}
               <button
                 className={styles.secondary}
                 disabled={busy}
-                onClick={() => {
-                  setLoading(true);
-                  setRevision((v) => v + 1);
-                }}
+                onClick={switchAccount}
               >
-                Retry invitation
-              </button>
-              <button
-                className={styles.secondary}
-                disabled={busy}
-                onClick={() => signOut({ redirectTo: "/join" })}
-              >
-                Sign out / switch account
+                {busy ? "Please wait…" : "Switch account"}
               </button>
             </div>
           )}
@@ -181,9 +221,7 @@ export function JoinScreen({ signedIn }: { signedIn: boolean }) {
             disabled={busy}
             onClick={dismiss}
           >
-            {signedIn
-              ? "Dismiss invitation / continue to workspace"
-              : "Dismiss invitation"}
+            {signedIn ? "Continue to my workspace" : "Dismiss invitation"}
           </button>
         </div>
       )}

@@ -110,6 +110,22 @@ tenant/assigned access and desktop/tablet/mobile layouts. See
 enabled live QA command. It creates temporary fixtures and cleans them afterward;
 production/load/concurrent-race acceptance remains separate.
 
+## Guests and families
+
+Open `/guests` after wedding setup. `VIEW_GUESTS` permits reading the ledger;
+`MANAGE_GUESTS` permits adding/editing guests and families, archive/restore, and
+primary-contact selection. Each attendee has a separate record. Contact details
+are optional; phone numbers need `+` and country code. Lists and pickers paginate
+on the server. Shared contacts/names produce a review warning, with explicit
+keep-both confirmation when they describe different people.
+
+Archive retains the guest and family association. Restore a guest before editing
+their details. Moving/archiving a family primary contact clears that selection.
+Families can be deleted only when empty of both active and archived records.
+No email, guest account, guest link, import, export, or RSVP behavior is added by
+this slice. Existing MongoDB configuration is used; no new dependency is required.
+Live guest-flow verification remains pending. No sample guest data is inserted.
+
 ## Members and collaborator invitations
 
 Open `/members` as a user with `MANAGE_MEMBERS`. This slice supports multiple
