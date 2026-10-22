@@ -35,6 +35,11 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
+- Approved Issues first-slice defaults: VIEW_ISSUES + MANAGE_ISSUES for planner
+  management; REPORT_ISSUES-only members read/comment on their own reports.
+  Vendor-role accounts never gain general issue-directory access from broad role
+  grants. Resolve/reopen retains history; no deletion in this slice.
+
 - In-app notification first slice: new task assignees only, excluding the actor;
   no backfill or notification for unchanged assignments. Persist alongside the task
   transaction with per-event/recipient deduplication. Scope every inbox/count/read

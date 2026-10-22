@@ -4,6 +4,22 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Notifications deployed (22 October 2026): application commit 87131a4 on local dev;
+Vercel deployment dpl_FVPGT2c1Vf7nk6BEp8dh6jHpjzEh READY at the existing public
+domain https://make-my-marriage-sepia.vercel.app. Hosted /login returns 200,
+/notifications redirects 307 anonymously, and GET /api/v1/notifications returns
+401. This smoke check confirms availability/authentication guards only; live
+two-account notification/security acceptance remains pending. No GitHub push,
+email, paid resource or automatic infrastructure change was performed.
+
+Issues preparation (22 October 2026): reviewed all four documents and Stitch's
+35-screen inventory (no Issues design). Added ISSUES_STITCH_PROMPT.md. User approved
+planner management, own-report reads/comments for report-only members, no vendor
+general directory and resolve/reopen without deletion. No Issues feature code or
+database changes yet. Remaining gallery storage must satisfy strict zero-budget
+policy before upload implementation; scheduled reminders, profiles/settings,
+livestream, custom roles and release/security acceptance remain follow-up work.
+
 Notifications release preparation (22 October 2026): user approved commit and
 deployment after reviewing the feature. Lint, TypeScript, formatting and release
 build pass. No new live notification/security test is claimed. Next design slice

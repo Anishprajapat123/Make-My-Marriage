@@ -24,6 +24,12 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
+- Approved Issues slice: planners manage with VIEW_ISSUES + MANAGE_ISSUES;
+  REPORT_ISSUES-only members may report, read and comment on their own reports.
+  Apply scope to counts/comments/reference lookups too. Vendor-role accounts have
+  no general directory access. Resolve/reopen preserves history; deletion is
+  deferred. Assignees must have access to the issue, not merely active membership.
+
 - Notifications first slice implements the approved design handoff: new active
   task assignees with task-read access, excluding the actor; unchanged assignments
   and existing tasks are not backfilled. Persist notifications in the task
