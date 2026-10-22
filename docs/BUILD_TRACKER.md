@@ -4,6 +4,15 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Deployment follow-up (22 October 2026): milestone committed locally on dev as
+f723975. Lint, TypeScript, formatting and production build pass after both review
+fixes. Vercel deployment dpl_ExhjrsV6Z7Nh8emCG1s9hFjHboUn is READY and aliased to
+https://make-my-marriage-sepia.vercel.app. Hosted smoke checks: /login 200;
+/dashboard, /vendors and /expenses redirect 307 anonymously; their three API
+endpoints return 401. This verifies availability/authentication guards, not a new
+signed-in browser acceptance run. No email, real payment or paid service was used.
+No GitHub push was requested/performed; deployment used the Vercel CLI.
+
 Review fixes (22 October 2026): expense edit vendor/event/member-payer selections
 are controlled so asynchronous choice loading cannot clear existing links. Mobile
 expense cards now apply the single-column override to subsequent sibling rows too.
