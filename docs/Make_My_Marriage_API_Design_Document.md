@@ -1172,6 +1172,25 @@ Automatic WhatsApp sending is Phase 2, so V1 tracks generated/shared invitation 
 
 # 18. Notification APIs
 
+**Implemented assignment-only slice (22 October 2026):** active authenticated
+membership and VIEW_WEDDING are required; no recipient or tenant ID is accepted
+from clients. GET accepts `unread=true|false`, `limit=1..50` (default 25), and an
+optional validated `cursor` (`createdAtMillis:notificationId`). Results descend by
+createdAt/_id and return `{items,unreadCount,nextCursor}`. Each item includes id,
+isRead, createdAt, and taskTitle/taskHref only when current taskScope allows that
+resource; otherwise both are null. Unread count includes the recipient's retained
+generic notifications even when task access is no longer available. All queries,
+counts and updates include tenantId + recipientMemberId. Responses use no-store.
+
+PATCH /:notificationId/read accepts `{}`, returns `{id,isRead:true}`, is idempotent
+and rechecks active membership inside its transaction. Foreign/non-recipient IDs
+return 404. Opening the inbox or task does not automatically mark notifications
+read. Read-all and preferences below remain future contracts, not implemented APIs.
+Creation is internal to successful task create/reassignment transactions, skips
+self-assignment and unchanged assignees, and does not backfill old tasks. Readding
+an assignee after removal generates a new assignment event. Bell/inbox refresh on
+navigation, focus and explicit retry; there is no realtime or scheduled delivery.
+
 ## 18.1 List notifications
 
 ```http

@@ -924,6 +924,16 @@ All monetary values must use `Decimal128` in MongoDB and be converted to display
 
 In-app notifications for wedding members.
 
+Implemented assignment slice (22 October 2026): type TASK_ASSIGNED, resourceType
+TASK, recipientMemberId and generic title/body (no historical task title or private
+details). A private eventKey combines task ID, saved task revision and assignment
+event; unique `{tenantId,recipientMemberId,eventKey}` prevents retry duplicates.
+Notification writes share the task transaction. Indexes include tenant, recipient,
+isRead, createdAt descending and _id descending, plus tenant/recipient/createdAt/_id
+for the All cursor listing. Task access is rechecked before title/link enrichment;
+unavailable resources retain a generic mark-readable entry. No TTL or automatic
+post-wedding deletion, guest account, provider token or notification email is added.
+
 Guests are not given notification accounts in V1.
 
 ## Fields

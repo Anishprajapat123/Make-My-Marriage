@@ -185,6 +185,18 @@ opt-in and separate approval to send its single test email to the fixed test
 recipient. Keep it disabled during ordinary reruns. Test credentials are random,
 remain in memory, and generated records are cleaned in `finally`.
 
+## In-app notifications
+
+Open `/notifications` or the workspace bell. New task assignments from other
+members create inbox items; assigning yourself or editing unchanged assignees
+does not. Existing tasks are not backfilled. The recipient must be active with
+task-read permission. Use All/Unread and Mark as read; opening a task or the inbox
+does not automatically mark it read. The bell updates on navigation, window focus
+and read actions; use Refresh for other changes. No background polling or instant
+push is promised. Task titles/links disappear when current access is unavailable.
+This slice sends no email and needs no paid service, queue or additional package.
+Live browser/security acceptance remains pending.
+
 ## Dashboard
 
 `/dashboard` now reads real planning data from the same server service exposed at

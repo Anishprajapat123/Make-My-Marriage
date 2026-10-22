@@ -7,6 +7,10 @@ import { UserModel } from "@/modules/auth/user.model";
 import { AccessError } from "@/lib/tenant/context";
 import type { TaskOptions, TaskView } from "./task.types";
 import { appendActivity } from "@/modules/activity/activity.repository";
+import {
+  prepareNotifications,
+  notifyTaskAssignments,
+} from "@/modules/notifications/notification.repository";
 
 export type TaskFilter = {
   tenantId: string;
@@ -159,6 +163,7 @@ export const taskRepository = {
     revision?: number,
     memberId?: string,
   ) {
+    await prepareNotifications();
     const session = await mongoose.startSession();
     try {
       return await session.withTransaction(async () => {
@@ -214,8 +219,23 @@ export const taskRepository = {
             },
             session,
           );
+          await notifyTaskAssignments(
+            {
+              tenantId: scope.tenantId,
+              taskId: String(task._id),
+              revision: task.revision,
+              actorMemberId: memberId!,
+              previous: [],
+              assigned: task.assigneeMemberIds.map(String),
+            },
+            session,
+          );
           return task.toObject();
         }
+        const previous = await TaskModel.findOne({ ...scope, revision })
+          .select("assigneeMemberIds")
+          .session(session)
+          .lean();
         const record = await TaskModel.findOneAndUpdate(
           { ...scope, revision },
           { $set: fields, $inc: { revision: 1 } },
@@ -238,6 +258,18 @@ export const taskRepository = {
           },
           session,
         );
+        if (fields.assigneeMemberIds !== undefined)
+          await notifyTaskAssignments(
+            {
+              tenantId: scope.tenantId,
+              taskId: String(record._id),
+              revision: record.revision,
+              actorMemberId: memberId!,
+              previous: (previous?.assigneeMemberIds ?? []).map(String),
+              assigned: record.assigneeMemberIds.map(String),
+            },
+            session,
+          );
         return record;
       });
     } finally {

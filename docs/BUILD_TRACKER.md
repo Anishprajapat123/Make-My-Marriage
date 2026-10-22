@@ -4,6 +4,34 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Notifications release preparation (22 October 2026): user approved commit and
+deployment after reviewing the feature. Lint, TypeScript, formatting and release
+build pass. No new live notification/security test is claimed. Next design slice
+is Issues & Problem Reporting; remaining whole-product work is not marked complete.
+
+Notifications first slice (22 October 2026): inspected Stitch desktop/mobile
+previews; implemented /notifications, All/Unread cursor pagination, unread bell
+across workspace pages, read-state actions and focus/manual refresh. Task create/
+assignment changes persist notifications in the same transaction with event-key
+deduplication; notify only newly added active recipients with task access, skip
+the actor and unchanged assignments. Stored text is generic; task titles/links
+are enriched only through current taskScope. Every inbox read/count/write uses
+tenantId and recipientMemberId. Removed sample header notifications and stale
+dashboard-preview copy. No dependencies, queue, scheduled jobs, emails, database
+fixtures, tests, commit/push or deployment in this step. Browser/live/security
+acceptance remains pending; existing task QA predates the new transaction hook.
+Lint, TypeScript, formatting and production build pass. No tests were added/run
+for this implementation step; do not infer notification runtime acceptance from
+the older task/expense test results.
+
+Notifications preparation (22 October 2026): reviewed the four documents and
+existing task transactions/access checks. Stitch inventory has 33 screens with no
+Notifications/Inbox design. Added NOTIFICATIONS_STITCH_PROMPT.md for responsive
+bell/inbox/read-state/task navigation. Proposed newly added assignees only,
+self-notification exclusion, transactional deduplication, recipient/tenant scope,
+current task-access checks and no backfill. Trigger/refresh rules await confirmation.
+No notification application code, dependency, database write or paid service added.
+
 Deployment follow-up (22 October 2026): milestone committed locally on dev as
 f723975. Lint, TypeScript, formatting and production build pass after both review
 fixes. Vercel deployment dpl_ExhjrsV6Z7Nh8emCG1s9hFjHboUn is READY and aliased to
@@ -227,7 +255,7 @@ review fixes. The earlier live QA results remain documented separately.
 
 - `[x]` Initial Next.js App Router and TypeScript scaffold, shared configuration, modular-monolith folders, Docker foundation, and project instructions.
 - `[x]` Responsive dashboard UI preview for desktop and mobile, using clearly labeled sample content.
-- `[~]` Dashboard identity now comes from the authenticated wedding and member. Planning counts, search results, notifications, and activity remain explicitly labeled sample data; no planning changes are saved.
+- `[x]` Dashboard now uses authenticated wedding identity and real permission-scoped planning summaries; snapshot search is bounded and sample activity has been removed. Task-assignment notifications replace the sample header bell.
 - `[ ]` Production features and persistence. No business module should be treated as implemented solely because its folder or a dashboard preview exists.
 
 ## Recommended implementation sequence
@@ -247,8 +275,8 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 - `[x]` Dashboard layout and responsive desktop/mobile presentation.
 - `[x]` Sample wedding overview, planning summaries, upcoming event, attention items, recent activity, and preview states.
 - `[x]` Make unavailable workspace navigation visibly non-navigating until its screen exists.
-- `[ ]` Replace sample content with authenticated, tenant-scoped dashboard data after the foundation and core modules are available.
-- `[ ]` Add real loading, empty, and error states when connecting the dashboard to data.
+- `[x]` Replace sample content with authenticated, tenant-scoped dashboard data after the foundation and core modules are available.
+- `[x]` Add real loading, empty, and error states when connecting the dashboard to data.
 
 ### 2. Account, authentication, and workspace access
 
@@ -279,10 +307,10 @@ Build incrementally, one reviewable feature slice at a time. For each slice: agr
 
 ### 5. Wedding operations
 
-- `[ ]` Expenses and payments, including role-restricted access, categories, status, due dates, summaries, and upcoming payment reminders.
-- `[ ]` Vendor records, member/vendor access boundaries, and vendor invitations where defined.
-- `[ ]` In-app notifications and member reminders, with preferences and read state.
-- `[ ]` Dashboard aggregation endpoint and real dashboard widgets after the source modules are available.
+- `[~]` Expenses first slice implemented and verified: exact INR, custom categories, full manual payment, protected Paid entries, archive/restore and summaries. Scheduled payment reminders and broader payment workflows remain deferred.
+- `[~]` Vendor directory and expense links implemented; user manual verification completed. Vendor-account access/invitations, documents and independent security acceptance remain deferred.
+- `[~]` Task-assignment in-app notifications, unread bell, inbox and read state implemented. Scheduled reminders, preferences, live security acceptance and broader notification triggers remain deferred.
+- `[x]` Dashboard aggregation endpoint and real permission-scoped widgets implemented; user manual verification reported. Independent Dashboard role/security checks remain pending.
 - `[ ]` Search and reports for the approved V1 scope.
 
 ### 6. Gallery and livestream

@@ -24,6 +24,15 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
+- Notifications first slice implements the approved design handoff: new active
+  task assignees with task-read access, excluding the actor; unchanged assignments
+  and existing tasks are not backfilled. Persist notifications in the task
+  transaction with event/recipient deduplication. Inbox/count/read mutations are
+  tenant + recipientMemberId scoped. Generic stored text must not expose historical
+  task titles after access is lost; reuse taskScope to authorize enrichment and
+  normal task routes to recheck navigation. Refresh on navigation/focus/manual retry;
+  no polling, email, push, preferences, read-all or scheduled reminders in this slice.
+
 - Dashboard first slice: real, permission-scoped server summaries shared by the
   page and GET /api/v1/dashboard. Keep assignment-only task scope, independent
   guest/RSVP permissions, VIEW_EXPENSES financial gating and VENDOR directory

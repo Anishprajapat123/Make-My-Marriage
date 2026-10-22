@@ -35,6 +35,12 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
+- In-app notification first slice: new task assignees only, excluding the actor;
+  no backfill or notification for unchanged assignments. Persist alongside the task
+  transaction with per-event/recipient deduplication. Scope every inbox/count/read
+  action by tenant and recipient membership. Store generic text and recheck task
+  access before returning titles/links. No email, push, scheduler or paid provider.
+
 - Dashboard summaries use real server-resolved data and module permissions.
   Reuse assignment-scoped task access; do not expose vendor-directory counts to
   VENDOR accounts or financial totals without VIEW_EXPENSES. Missing permissions

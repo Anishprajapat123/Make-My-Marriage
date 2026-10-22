@@ -20,11 +20,15 @@ import {
 import type { ReactNode } from "react";
 import styles from "./workspace-shell.module.css";
 import { SignOutButton } from "./sign-out-button";
+import { NotificationBell } from "@/modules/notifications/components/notification-bell";
 
 const navigation = [
   {
     label: "Workspace",
-    items: [{ label: "Dashboard", icon: LayoutDashboard, active: true }],
+    items: [
+      { label: "Dashboard", icon: LayoutDashboard, active: true },
+      { label: "Notifications", icon: Bell, active: false },
+    ],
   },
   {
     label: "Plan",
@@ -66,6 +70,7 @@ function NavigationItems({
             label === "Invitations" ||
             label === "Expenses" ||
             label === "Vendors" ||
+            label === "Notifications" ||
             label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
@@ -85,7 +90,9 @@ function NavigationItems({
                               ? "/expenses"
                               : label === "Vendors"
                                 ? "/vendors"
-                                : "/dashboard"
+                                : label === "Notifications"
+                                  ? "/notifications"
+                                  : "/dashboard"
                 }
                 key={label}
               >
@@ -234,8 +241,8 @@ export function WorkspaceShell({
             <span aria-hidden="true">/</span>
             <strong>{activePage}</strong>
           </div>
-          {activePage === "Dashboard" && (
-            <div className={styles.topbarActions}>
+          <div className={styles.topbarActions}>
+            {activePage === "Dashboard" && (
               <form
                 action="/dashboard"
                 className={styles.searchBox}
@@ -253,21 +260,9 @@ export function WorkspaceShell({
                 />
                 <kbd>Enter</kbd>
               </form>
-              <details className={styles.headerPopover}>
-                <summary
-                  aria-label="Open sample notifications"
-                  className={styles.iconButton}
-                >
-                  <Bell aria-hidden="true" size={19} />
-                  <span className={styles.notificationDot} />
-                </summary>
-                <div className={styles.popoverPanel}>
-                  <strong>Recent updates</strong>
-                  <p>Priya added 5 guests to the sample list.</p>
-                  <p>Photography payment is due in 5 days.</p>
-                  <span>Preview notifications · not live</span>
-                </div>
-              </details>
+            )}
+            <NotificationBell />
+            {activePage === "Dashboard" && (
               <details className={styles.headerPopover}>
                 <summary
                   aria-label="Open dashboard help"
@@ -278,23 +273,16 @@ export function WorkspaceShell({
                 <div className={styles.popoverPanel}>
                   <strong>About this dashboard</strong>
                   <p>
-                    This is a responsive UI preview built from sample wedding
-                    data.
+                    Your dashboard shows the wedding data your current role can
+                    access.
                   </p>
-                  <span>
-                    Actions and records are not connected to an account yet.
-                  </span>
+                  <span>Reload the dashboard to refresh its snapshot.</span>
                 </div>
               </details>
-            </div>
-          )}
+            )}
+          </div>
         </header>
         {children}
-        {activePage === "Dashboard" && (
-          <footer className={styles.previewFooter}>
-            Dashboard preview · sample data only
-          </footer>
-        )}
       </main>
     </div>
   );
