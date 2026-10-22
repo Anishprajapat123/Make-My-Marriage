@@ -740,6 +740,17 @@ API: /api/v1/public/invitations/{token}/rsvp</th>
 
 ## 11.4 Expense entry
 
+First slice (21 October 2026): modules/expenses owns the private ledger and one
+embedded full-payment record per expense. Decimal128 storage and exact paise
+arithmetic avoid floating-point financial calculations. Read permission and
+operation-specific mutation permissions are verified server-side; write checks
+are repeated inside the shared wedding transaction. Tenant-scoped event/member
+references, revisions, idempotent create/payment keys and activity logs protect
+collaborative changes. Paid records are protected, unpaid records archive/restore,
+and totals derive from active records. Budget input, receipts, partial payments,
+corrections, vendors and payment reminders remain future work. No money is sent
+and no paid infrastructure is required for this demo slice.
+
 <table>
 <colgroup>
 <col style="width: 100%" />

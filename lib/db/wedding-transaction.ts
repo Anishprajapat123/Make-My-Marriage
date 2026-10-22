@@ -6,7 +6,7 @@ import { RoleModel } from "@/modules/roles/role.model";
 export async function withWeddingTransaction<T>(
   tenantId: string,
   operation: (session: ClientSession) => Promise<T>,
-  actor?: { ctx: TenantContext; permission: string },
+  actor?: { ctx: TenantContext; permission: string | readonly string[] },
 ) {
   const session = await mongoose.startSession();
   try {
@@ -33,7 +33,15 @@ export async function withWeddingTransaction<T>(
         })
           .session(session)
           .lean();
-        if (!roles.some((r) => r.permissionKeys.includes(actor.permission)))
+        const required =
+          typeof actor.permission === "string"
+            ? [actor.permission]
+            : actor.permission;
+        if (
+          !required.every((key) =>
+            roles.some((r) => r.permissionKeys.includes(key)),
+          )
+        )
           throw new AccessError(403, "FORBIDDEN", "Permission is required.");
         await MemberModel.collection.updateOne(
           {

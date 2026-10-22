@@ -1,5 +1,16 @@
 # Make My Marriage
 
+Expenses first slice: open `/expenses` as an authorized member. Add an INR
+expense with a built-in category suggestion or type your own custom category;
+custom labels stay on that expense and are not added to the suggestion list.
+Create an
+Estimated or Committed cost, optionally choose an event/payer/deadline, and record
+a full payment only after it was paid outside the app. Paid entries are protected;
+unpaid entries archive/restore. Budget entry and partial payments are deferred.
+Finance Manager and Owner can manage/pay; Family Admin currently reads only.
+The UI uses real records and does not insert sample financial data. Restart local
+dev once after pulling new Mongoose models. Live expense acceptance is pending.
+
 Temporary free hosting setup: see [Vercel + Brevo deployment](docs/FREE_DEPLOYMENT.md).
 
 Next.js modular-monolith application for the Make My Marriage project. The
@@ -173,6 +184,31 @@ The real SES check requires the additional explicit `RUN_REAL_SES_MEMBER_QA=1`
 opt-in and separate approval to send its single test email to the fixed test
 recipient. Keep it disabled during ordinary reruns. Test credentials are random,
 remain in memory, and generated records are cleaned in `finally`.
+
+## Dashboard
+
+`/dashboard` now reads real planning data from the same server service exposed at
+`GET /api/v1/dashboard`. Each section requires its module permission; assigned-only
+members see only their scoped task counts and recent tasks. Vendor accounts do not
+receive vendor-directory counts. Upcoming events are the next three published
+future events. Search covers the visible snapshot only; use each module to search
+all its records. Missing data shows an empty state, and failed loading offers retry.
+Reload to refresh. No fabricated activity, budget or planning statistics are shown.
+
+## Vendors and expense linking
+
+Open `/vendors` as an authorized wedding member. VIEW_VENDORS permits directory
+reads; MANAGE_VENDORS additionally permits add/edit/archive/restore. Vendor-role
+accounts cannot use the directory until scoped vendor access is implemented.
+No invitation/account is created when adding a supplier. Contacts, events and
+notes are optional. Archived suppliers keep their history and expense links.
+
+In an unpaid expense's **Optional details**, choose an active vendor or leave it
+unlinked. Existing archived links can be retained; paid expense links stay locked.
+Vendor details show exact linked Estimated, Committed-unpaid and Paid totals only
+with VIEW_EXPENSES. These totals do not represent a contract balance. Vendor
+documents, invitations and separate vendor payment entry are deferred. This slice
+adds no paid resources or dependencies. Live vendor acceptance remains pending.
 
 ## Guest invitations and RSVP
 

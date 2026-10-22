@@ -775,6 +775,19 @@ Invitation links do not expire automatically. An admin can revoke and regenerate
 
 Lightweight vendor management.
 
+**Implemented first slice (22 October 2026):** the approved category contract uses
+the PRD supplier category enum, nested contact strings, service (500) and notes
+(2000), at most 100 distinct eventIds and ACTIVE/ARCHIVED status. COMPLETED is
+deferred. `revision` protects update/archive/restore; `referenceVersion` is touched
+transactionally when expenses link a vendor. Creation uses private requestId and
+requestHash fields, with a unique partial `{tenantId,requestId}` index for retries.
+Indexes also cover `{tenantId,category,status}`, `{tenantId,eventIds}` and
+`{tenantId,status,name}`. Archive retains every expense reference; restore does not
+alter payments. Stored totalAmount/paidAmount/balanceAmount/paymentDueAt fields in
+the original table below are deferred: monetary summaries come from active linked
+expenses using exact Decimal128 aggregation and decimal-string responses. No
+duplicate vendor financial ledger, document objects or vendor identity is created.
+
 ## Fields
 
 | Field | Type | Required |
@@ -844,6 +857,30 @@ UNIQUE: { tenantId: 1, s3Key: 1 }
 ---
 
 # 21. `expenses` Collection
+
+## First-slice implementation additions — 21 October 2026
+
+Category is a bounded string (1–80 characters), not a fixed enum. Built-in names
+use their canonical keys; custom labels preserve case after whitespace/Unicode
+normalization. Store the label on the expense only; no category catalog or new
+collection is created.
+
+Approved INR-only slice adds status ACTIVE/ARCHIVED and integer revision. Create
+requestId/requestHash are private fields; unique tenantId+requestId uses a partial
+string index. One embedded payment contains exact Decimal128 amount, paidAt,
+method, notes, payerLabel snapshot, recordedByMemberId, recordedAt and private
+requestId/requestHash. Unique tenantId+payment.requestId is partial on strings.
+Payment and PAID state are written in the same transaction; they cannot be edited
+independently. A COMMITTED expense must be settled in full. No partial payments,
+refunds/corrections or separate payment collection in this first slice.
+
+Paid entries cannot be archived/edited. Unpaid archive/restore retains references
+and history and changes active summary inclusion. Amounts use Decimal128 and
+exact bigint paise arithmetic; API values are bounded INR decimal strings. Event
+references are locked transactionally alongside mutation to preserve event
+deletion guards. Write transactions revalidate both read and mutation permissions
+and append activity. No persisted budget field or manually editable summary totals
+are introduced. Existing expense field definitions below remain the base model.
 
 Tracks the wedding's financial records.
 

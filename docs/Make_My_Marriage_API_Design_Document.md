@@ -1259,6 +1259,53 @@ The reminder service must verify the requester has permission to manage the reso
 
 # 20. Expense APIs
 
+### Implemented first-slice contract — 21 October 2026
+
+Custom-category update: category is required free text, maximum 80 characters,
+containing a letter or number. Trim/collapse whitespace and normalize Unicode;
+built-in names canonicalize to their existing keys, custom display casing stays.
+Category filter is an escaped exact case-insensitive match. No category creation
+endpoint, category collection or persistent custom suggestion list is introduced.
+
+This implementation supersedes the original singular amount/status/payer examples
+below for the first slice. INR only; JSON amounts are positive decimal strings
+with up to two fraction digits and at most 12 whole digits, not floating numbers.
+Canonical amount responses include two decimals. Financial states are ESTIMATED,
+COMMITTED, PAID, and archival status is separately ACTIVE/ARCHIVED.
+
+- GET `/api/v1/expenses`: search, category, financialState, eventId, status,
+  overdue=true/false, sort=NEWEST/DUE/AMOUNT_ASC/AMOUNT_DESC/TITLE, page and limit
+  (default 25, maximum 50). DUE sorts missing deadlines first using MongoDB null
+  ordering. Returns expenses, total, page, limit. Archived records remain readable.
+- GET `/api/v1/expenses/summary`: wedding-wide active estimated, committed unpaid,
+  paid and total recorded amounts, active count, overdue count and budget=null.
+  Estimates and commitments are disjoint; no paid amount is included in unpaid
+  commitments. Do not infer a budget from total recorded costs.
+- GET `/api/v1/expenses/options`: minimal event references and, only for expense
+  managers, active-member payer references (bounded at 500 each). No member emails.
+- POST `/api/v1/expenses`: `{requestId: UUID, expense: {...}}`. Expense fields:
+  title, category, amount, financialState=ESTIMATED/COMMITTED, optional eventId,
+  paidByMemberId OR paidByName, dueLocal=YYYY-MM-DDTHH:mm (or null), notes.
+  Server resolves timezone and tenant. No vendor entry in this slice.
+- GET/PATCH `/api/v1/expenses/:id`: GET returns safe detail including one payment
+  if present. PATCH accepts `{revision, expense}`. Paid or archived edits blocked.
+- DELETE `/api/v1/expenses/:id`: `{revision}` archives an unpaid record.
+  POST `/api/v1/expenses/:id/restore` with revision restores it. No hard deletion.
+- POST `/api/v1/expenses/:id/payments`: `{requestId:UUID, revision, amount,
+  paidLocal:YYYY-MM-DDTHH:mm, method, notes}` records exactly the full amount for
+  an active COMMITTED expense and atomically marks it PAID. Methods: CASH,
+  BANK_TRANSFER, UPI, CARD, CHEQUE, OTHER. These describe an external payment;
+  there is no checkout or processing. Future payment dates are rejected.
+- All reads require VIEW_EXPENSES. Editing requires it plus MANAGE_EXPENSES;
+  payment recording requires it plus MANAGE_PAYMENTS, revalidated in transaction.
+  All tenant-owned queries/references are scoped. Date conversion rejects invalid
+  or ambiguous local times. Stale revisions and protected actions return 409.
+- Create/payment identifiers are unique per tenant; identical retries return the
+  retained result, changed-body reuse returns 409. Payment amount must match the
+  current expense. There is no partial payment, correction or refund endpoint.
+- Budget editing, payment-obligation listing/upcoming APIs, receipts, vendor
+  integration and in-app payment reminders remain follow-up slices.
+
 ## 20.1 List expenses
 
 ```http
@@ -1370,10 +1417,51 @@ The API should derive pending payment summaries from the expense/payment model r
 
 # 22. Vendor APIs
 
+### Implemented first slice — 22 October 2026
+
+This approved contract supersedes the earlier examples below where they differ.
+All routes resolve tenant context from the verified active membership. Reads
+require VIEW_VENDORS; mutations additionally require MANAGE_VENDORS. Accounts with
+the VENDOR role are denied this directory even if that role grants VIEW_VENDORS;
+vendor-specific access and invitations are deferred. No existing roles are migrated.
+
+- `GET /api/v1/vendors`: `search` (name/contact, escaped literal match), `category`,
+  `eventId`, `status=ACTIVE|ARCHIVED`, `sort=NAME|NEWEST`, `page` (1–10000) and
+  `limit` (1–50, default 25). Returns `{vendors,total,page,limit}`.
+- `POST /api/v1/vendors`: `{requestId: <UUID>, vendor: <fields>}`. Retry with the
+  same normalized payload returns the same ID; different data with that key is 409.
+- `GET /api/v1/vendors/:vendorId`: explicit vendor fields, resolved event names,
+  and optional `financials` only with VIEW_EXPENSES. Financials are active linked
+  expense `count`, `estimated`, `committed`, `paid` (exact INR decimal strings).
+  They are recorded expense totals, not contract balances; no financial data is
+  returned without the additional permission.
+- `PATCH /api/v1/vendors/:vendorId`: `{revision,vendor:<fields>}`; active vendors only.
+- `DELETE /api/v1/vendors/:vendorId`: `{revision}` archives; never hard deletes.
+- `POST /api/v1/vendors/:vendorId/restore`: `{revision}` restores an archived record.
+- `GET /api/v1/vendors/options`: bounded wedding event ID/name choices (up to 500).
+
+Vendor fields: required `name` (1–180), canonical `category` enum (VENUE,
+PHOTOGRAPHER, CATERER, DECORATOR, MAKEUP_ARTIST, MEHENDI_ARTIST, DJ, BAND, PANDIT,
+INVITATION_PROVIDER, OTHER), `contact: {personName,phone,email}` (optional strings,
+limits 120/40/254), `service` (500), `notes` (2000), and up to 100 distinct
+`eventIds`. Phone/email are optional, shared contacts and names are allowed.
+Unknown properties, invalid references and invalid inputs fail validation (400);
+foreign/missing vendor IDs return 404; stale revisions/lifecycle conflicts 409.
+Create/edit/archive/restore append transactional activity and revalidate access.
+
+Expense create/edit now accepts optional nullable `vendorId`. New links require an
+active same-tenant vendor; an existing archived vendor link may be retained while
+editing an unpaid expense. Paid expense links cannot change. Expense options expose
+only active vendor IDs/names (up to 500) to expense editors, never contacts/notes;
+vendor-role accounts do not receive these choices. Directory access remains
+separate. Expense DTOs include vendorId/vendorName; references survive archive.
+Document upload, vendor login/invite, COMPLETED workflow and editable independent
+vendor monetary totals are not implemented in this slice.
+
 ## 22.1 List vendors
 
 ```http
-GET /api/v1/vendors?eventId=event_123&type=PHOTOGRAPHER
+GET /api/v1/vendors?eventId=<eventId>&category=PHOTOGRAPHER
 ```
 
 ## 22.2 Create vendor
@@ -1762,6 +1850,22 @@ Audit logs should be append-oriented and should not be casually editable through
 The dashboard should use aggregation endpoints rather than requiring the client to make many small API calls for every card.
 
 ## 29.1 Main wedding dashboard
+
+**Implemented first slice (22 October 2026):** GET requires a verified active
+membership and VIEW_WEDDING. It returns `{events,tasks,guests,rsvp,expenses,vendors,
+generatedAt}` with `Cache-Control: no-store`. Sections lacking their corresponding
+permission are null and their queries are not executed. Task counts/recent tasks
+reuse assignment-aware task access, including assigned-only roles. Guest counts
+include active individual records and families on file. RSVP returns yes/no/pending
+counts for active guests (responses, not actual attendance). Expenses reuse exact
+decimal-string summary values, with Budget not set. VENDOR-role accounts receive
+no vendor count. Events include at most three upcoming PUBLISHED records, and recent
+tasks at most five; no contacts, private notes, tokens or arbitrary activity feed is
+returned. Vendor and guest reads remain scoped by tenant in the database operation.
+The authenticated page calls the same service directly, without HTTP loopback.
+Wedding identity/countdown are server-rendered from current wedding settings.
+The broader example below describes future dashboard shape; issues, contract
+balances, organizer aggregation and cross-module activity are deferred.
 
 ```http
 GET /api/v1/dashboard

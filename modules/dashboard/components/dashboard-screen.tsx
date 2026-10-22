@@ -1,215 +1,171 @@
+import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
   Check,
-  ChevronDown,
-  CircleAlert,
-  Clock3,
   IndianRupee,
-  MapPin,
-  MoreHorizontal,
-  Sparkles,
+  Store,
   UsersRound,
 } from "lucide-react";
 import { WorkspaceShell } from "@/components/layout/workspace-shell";
+import type { DashboardData } from "../dashboard.service";
+import { formatMoney } from "@/modules/expenses/expense.money";
+import { statusLabels } from "@/modules/tasks/task.types";
 import styles from "./dashboard-screen.module.css";
-
-const summary = [
-  {
-    label: "Tasks completed",
-    value: "37",
-    detail: "of 52 total",
-    icon: Check,
-    tone: "plum",
-    progress: 71,
-  },
-  {
-    label: "Guest list",
-    value: "742",
-    detail: "across 186 families",
-    icon: UsersRound,
-    tone: "sage",
-  },
-  {
-    label: "RSVP confirmed",
-    value: "624",
-    detail: "84% response rate",
-    icon: CalendarDays,
-    tone: "sand",
-  },
-  {
-    label: "Expenses tracked",
-    value: "₹4,82,500",
-    detail: "of ₹10,00,000 budget",
-    icon: IndianRupee,
-    tone: "rose",
-  },
-];
-
-const attentionItems = [
-  {
-    type: "Overdue task",
-    title: "Confirm the final guest list",
-    detail: "Assigned to you · Due 2 days ago",
-    tone: "urgent",
-    icon: CircleAlert,
-  },
-  {
-    type: "Pending RSVP",
-    title: "118 guests haven’t responded",
-    detail: "Invitation response needed",
-    tone: "pending",
-    icon: UsersRound,
-  },
-  {
-    type: "Payment coming up",
-    title: "Photography · ₹35,000",
-    detail: "Due in 5 days · Oct 13",
-    tone: "payment",
-    icon: IndianRupee,
-  },
-];
-
-const activityItems = [
-  {
-    initials: "P",
-    name: "Priya",
-    action: "added 5 guests to the list",
-    time: "10:32 AM",
-    tone: "plum",
-  },
-  {
-    initials: "R",
-    name: "Rahul",
-    action: "completed “Book the photographer”",
-    time: "9:48 AM",
-    tone: "sage",
-  },
-  {
-    initials: "A",
-    name: "Anish",
-    action: "updated the Sangeet start time",
-    time: "Yesterday",
-    tone: "sand",
-  },
-];
-
-const additionalActivityItems = [
-  {
-    initials: "M",
-    name: "Meera",
-    action: "shared the venue contact details",
-    time: "Yesterday",
-    tone: "rose",
-  },
-  {
-    initials: "A",
-    name: "Anish",
-    action: "marked the invitation draft as ready",
-    time: "Tuesday",
-    tone: "sand",
-  },
-];
-
-const searchableContent = [
-  { label: "Haldi", detail: "Upcoming event · October 10", href: "#upcoming" },
-  {
-    label: "Confirm the final guest list",
-    detail: "Overdue task · needs attention",
-    href: "#attention",
-  },
-  {
-    label: "118 guests haven’t responded",
-    detail: "Pending RSVP · needs attention",
-    href: "#attention",
-  },
-  {
-    label: "Photography payment",
-    detail: "₹35,000 due October 13",
-    href: "#attention",
-  },
-  {
-    label: "Recent activity",
-    detail: "Latest workspace updates",
-    href: "#activity",
-  },
-];
-
-function PreviewLabel() {
-  return (
-    <span className={styles.previewLabel}>
-      <Sparkles aria-hidden="true" size={13} />
-      Sample planning data
-    </span>
-  );
-}
-
+type Wedding = {
+  title: string;
+  bride: { name: string };
+  groom: { name: string };
+  weddingDate: Date;
+  city: string;
+  timezone: string;
+};
 export function DashboardScreen({
   searchQuery = "",
   memberName,
   wedding,
+  data,
+  roleLabel,
 }: {
   searchQuery?: string;
   memberName: string;
-  wedding: {
-    title: string;
-    bride: { name: string };
-    groom: { name: string };
-    weddingDate: Date;
-    city: string;
-    timezone: string;
-  };
+  wedding: Wedding;
+  data: DashboardData | null;
+  roleLabel: string;
 }) {
-  const cleanQuery = searchQuery.trim().slice(0, 100);
-  const normalizedQuery = cleanQuery.toLocaleLowerCase();
-  const searchResults = normalizedQuery
-    ? searchableContent.filter((item) =>
-        `${item.label} ${item.detail}`
-          .toLocaleLowerCase()
-          .includes(normalizedQuery),
-      )
-    : [];
-  const todayLabel = new Intl.DateTimeFormat("en", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: wedding.timezone,
-  }).format(new Date());
-  const weddingDateLabel = new Intl.DateTimeFormat("en-GB", {
+  const cleanQuery = searchQuery.trim().slice(0, 100),
+    now = new Date();
+  const dateFormat = new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "UTC",
-  }).format(wedding.weddingDate);
-  const zonedTodayParts = new Intl.DateTimeFormat("en", {
-    calendar: "gregory",
-    numberingSystem: "latn",
+  });
+  const dateLabel = dateFormat.format(wedding.weddingDate);
+  const todayParts = new Intl.DateTimeFormat("en", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     timeZone: wedding.timezone,
-  })
-    .formatToParts(new Date())
-    .reduce<Record<string, string>>((parts, item) => {
-      parts[item.type] = item.value;
-      return parts;
-    }, {});
-  const todayYear = Number(zonedTodayParts.year);
-  const todayMonth = Number(zonedTodayParts.month);
-  const todayDay = Number(zonedTodayParts.day);
-  const weddingDayCount = Math.ceil(
+    numberingSystem: "latn",
+    calendar: "gregory",
+  }).formatToParts(now);
+  const part = (type: string) =>
+    Number(todayParts.find((p) => p.type === type)?.value);
+  const days = Math.ceil(
     (wedding.weddingDate.getTime() -
-      Date.UTC(todayYear, todayMonth - 1, todayDay)) /
-      86_400_000,
+      Date.UTC(part("year"), part("month") - 1, part("day"))) /
+      86400000,
   );
-  const firstName = memberName.trim().split(/\s+/)[0] || "there";
-
+  const todayLabel = new Intl.DateTimeFormat("en", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: wedding.timezone,
+  }).format(now);
+  const when = (value: string) =>
+    new Intl.DateTimeFormat("en-IN", {
+      day: "numeric",
+      month: "short",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: wedding.timezone,
+    }).format(new Date(value));
+  const summary = [];
+  if (data?.tasks)
+    summary.push({
+      label: data.tasks.assignedOnly ? "My tasks completed" : "Tasks completed",
+      value: String(data.tasks.counts.completed),
+      detail: `of ${data.tasks.counts.total} ${data.tasks.assignedOnly ? "assigned" : "total"} tasks`,
+      icon: Check,
+      tone: "plum",
+      href: "/tasks",
+    });
+  if (data?.guests)
+    summary.push({
+      label: "Guest list",
+      value: String(data.guests.total),
+      detail: `Active guests · ${data.guests.families} families on file`,
+      icon: UsersRound,
+      tone: "sage",
+      href: "/guests",
+    });
+  if (data?.rsvp)
+    summary.push({
+      label: "RSVP · Yes",
+      value: String(data.rsvp.yes),
+      detail: `${data.rsvp.pending} pending · ${data.rsvp.no} declined`,
+      icon: CalendarDays,
+      tone: "sand",
+      href: "/invitations",
+    });
+  if (data?.expenses)
+    summary.push({
+      label: "Paid to date",
+      value: formatMoney(data.expenses.paid),
+      detail: "Recorded external payments · Budget not set",
+      icon: IndianRupee,
+      tone: "rose",
+      href: "/expenses",
+    });
+  if (data?.vendors)
+    summary.push({
+      label: "Active vendors",
+      value: String(data.vendors.active),
+      detail: "Suppliers in your wedding directory",
+      icon: Store,
+      tone: "plum",
+      href: "/vendors",
+    });
+  const searchable = [
+    ...summary.map((s) => ({
+      label: s.label,
+      detail: `${s.value} · ${s.detail}`,
+      href: s.href,
+    })),
+    ...(data?.events ?? []).map((e) => ({
+      label: e.name,
+      detail: `Event · ${when(e.startAt)}`,
+      href: `/events/${e.id}`,
+    })),
+    ...(data?.tasks?.recent ?? []).map((t) => ({
+      label: t.title,
+      detail: `Task · ${statusLabels[t.status]}`,
+      href: `/tasks/${t.id}`,
+    })),
+  ];
+  const matches = cleanQuery
+    ? searchable.filter((item) =>
+        `${item.label} ${item.detail}`
+          .toLocaleLowerCase()
+          .includes(cleanQuery.toLocaleLowerCase()),
+      )
+    : [];
+  const attention = [];
+  if (data?.tasks?.counts.overdue)
+    attention.push({
+      label: `${data.tasks.counts.overdue} overdue ${data.tasks.assignedOnly ? "assigned " : ""}tasks`,
+      detail: "Review deadlines and update progress.",
+      href: "/tasks",
+    });
+  if (data?.rsvp?.pending)
+    attention.push({
+      label: `${data.rsvp.pending} guests have not responded`,
+      detail: "RSVP confirmations are responses, not checked-in attendance.",
+      href: "/invitations",
+    });
+  if (data?.expenses?.overdue)
+    attention.push({
+      label: `${data.expenses.overdue} overdue unpaid expenses`,
+      detail: "Review your recorded deadlines in Expenses.",
+      href: "/expenses",
+    });
   return (
     <WorkspaceShell
       searchQuery={cleanQuery}
       weddingTitle={wedding.title}
       memberName={memberName}
+      roleLabel={roleLabel}
     >
       <div className={styles.dashboard}>
         <section className={styles.welcome}>
@@ -217,304 +173,249 @@ export function DashboardScreen({
             <div className={styles.welcomeEyebrow}>
               <span className={styles.eyebrowLine} />
               {todayLabel}
-              <PreviewLabel />
             </div>
             <h1>
-              Good morning, {firstName}
+              Hello, {memberName.trim().split(/\s+/)[0] || "there"}
               <span>.</span>
             </h1>
             <p>Here’s what’s happening with your wedding.</p>
           </div>
-          <div className={styles.headerActions}>
-            <span className={styles.weddingDate}>
-              <CalendarDays aria-hidden="true" size={15} />
-              <span>{weddingDateLabel}</span>
-            </span>
-            <details className={styles.actionMenu}>
-              <summary className={styles.primaryButton}>
-                <MoreHorizontal aria-hidden="true" size={17} />
-                <span>Wedding actions</span>
-                <ChevronDown aria-hidden="true" size={14} />
-              </summary>
-              <div className={styles.actionMenuPanel}>
-                <a href="#dashboard-overview">Wedding overview</a>
-                <a href="#summary">Planning progress</a>
-                <a href="#upcoming">Upcoming celebration</a>
-                <a href="#preview-note">About this preview</a>
-              </div>
-            </details>
-          </div>
+          <span className={styles.weddingDate}>
+            <CalendarDays size={16} aria-hidden="true" />
+            {dateLabel}
+          </span>
         </section>
-
-        {cleanQuery ? (
-          <section aria-live="polite" className={styles.searchResults}>
-            <div className={styles.searchResultsHeader}>
-              <div>
-                <span className={styles.cardEyebrow}>SAMPLE DATA SEARCH</span>
-                <h2>Results for “{cleanQuery}”</h2>
-              </div>
-              <a href="/dashboard">Clear search</a>
-            </div>
-            {searchResults.length ? (
-              <div className={styles.searchResultsList}>
-                {searchResults.map((result) => (
-                  <a href={result.href} key={result.label}>
-                    <span>
-                      <strong>{result.label}</strong>
-                      <small>{result.detail}</small>
-                    </span>
-                    <ArrowRight aria-hidden="true" size={15} />
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className={styles.noSearchResults}>
-                No sample dashboard items matched that search.
-              </p>
-            )}
-          </section>
-        ) : null}
-
-        <section
-          aria-label="Wedding overview"
-          className={styles.weddingBanner}
-          id="dashboard-overview"
-        >
+        <section className={styles.weddingBanner} aria-label="Wedding overview">
           <div className={styles.couplePortrait} aria-hidden="true">
-            <span>{wedding.bride.name.slice(0, 1).toUpperCase()}</span>
+            <span>{wedding.bride.name.slice(0, 1)}</span>
             <i>&</i>
-            <span>{wedding.groom.name.slice(0, 1).toUpperCase()}</span>
+            <span>{wedding.groom.name.slice(0, 1)}</span>
           </div>
           <div className={styles.weddingIdentity}>
             <span className={styles.cardEyebrow}>THE CELEBRATION OF</span>
             <h2>{wedding.title}</h2>
             <p>
-              {wedding.city} <span>·</span> {weddingDateLabel}
+              {wedding.city} · {dateLabel}
             </p>
           </div>
           <div className={styles.countdown}>
-            <strong>{Math.abs(weddingDayCount)}</strong>
-            <span>{weddingDayCount >= 0 ? "days to go" : "days since"}</span>
-          </div>
-          <div className={styles.bannerOrnament} aria-hidden="true">
-            ✳
+            <strong>{Math.abs(days)}</strong>
+            <span>
+              {days < 0 ? "days since" : days === 0 ? "today" : "days to go"}
+            </span>
           </div>
         </section>
-
-        <section
-          aria-label="Planning summary"
-          className={styles.summaryGrid}
-          id="summary"
-        >
-          {summary.map(
-            ({ label, value, detail, icon: Icon, tone, progress }) => (
-              <article className={styles.summaryCard} key={label}>
-                <div className={styles.summaryTop}>
-                  <span className={`${styles.summaryIcon} ${styles[tone]}`}>
-                    <Icon aria-hidden="true" size={17} strokeWidth={1.8} />
-                  </span>
-                  {typeof progress === "number" ? (
-                    <span className={styles.progressNote}>{progress}%</span>
-                  ) : null}
-                </div>
-                <p className={styles.summaryLabel}>{label}</p>
-                <div className={styles.summaryValue}>{value}</div>
-                <p className={styles.summaryDetail}>{detail}</p>
-                {typeof progress === "number" ? (
-                  <div
-                    aria-label={`${progress}% complete`}
-                    className={styles.progressTrack}
-                  >
-                    <span style={{ width: `${progress}%` }} />
-                  </div>
-                ) : null}
-              </article>
-            ),
-          )}
-        </section>
-
-        <div className={styles.contentGrid}>
-          <section
-            aria-labelledby="upcoming-title"
-            className={styles.upcomingCard}
-            id="upcoming"
-          >
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.cardEyebrow}>UP NEXT</span>
-                <h2 id="upcoming-title">Your next celebration</h2>
-              </div>
-              <span className={styles.upcomingCount}>
-                01 <span>/ 05</span>
-              </span>
-            </div>
-            <div className={styles.eventPanel}>
-              <div className={styles.eventDateBlock}>
-                <span>OCT</span>
-                <strong>10</strong>
-                <span>SATURDAY</span>
-              </div>
-              <div className={styles.eventDetails}>
-                <span className={styles.eventType}>PRE-WEDDING CEREMONY</span>
-                <h3>Haldi</h3>
-                <div className={styles.eventMeta}>
-                  <span>
-                    <Clock3 aria-hidden="true" size={14} /> 10:00 AM – 1:00 PM
-                  </span>
-                  <span>
-                    <MapPin aria-hidden="true" size={14} /> The Rosewood
-                    Courtyard
-                  </span>
-                </div>
-              </div>
-              <span className={styles.eventStatus}>In 2 days</span>
-            </div>
-            <div className={styles.timelinePreview}>
-              <span className={styles.timelineDot} />
-              <div>
-                <span className={styles.timelineTime}>10:00 AM</span>
-                <strong>Welcome & refreshments</strong>
-              </div>
-              <span className={styles.timelineDivider} />
-              <span className={styles.timelineDotMuted} />
-              <div>
-                <span className={styles.timelineTime}>11:00 AM</span>
-                <strong>Haldi ceremony</strong>
-              </div>
-            </div>
-            <div className={styles.eventFooter}>
-              <span>Timeline preview · 2 of 5 ceremony moments</span>
-              <span className={styles.previewOnly}>Sample event</span>
-            </div>
+        {!data ? (
+          <section className={styles.liveEmpty} role="alert">
+            <h2>Dashboard data is temporarily unavailable</h2>
+            <p>Your records have not been changed. Reload to try again.</p>
+            <a className={styles.liveAction} href="/dashboard">
+              Retry dashboard
+            </a>
           </section>
-
-          <section
-            aria-labelledby="attention-title"
-            className={styles.attentionCard}
-            id="attention"
-          >
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.cardEyebrow}>A LITTLE NUDGE</span>
-                <h2 id="attention-title">Needs your attention</h2>
-              </div>
-              <span className={styles.attentionCount}>3</span>
-            </div>
-            <div className={styles.attentionList}>
-              {attentionItems.map(
-                ({ type, title, detail, tone, icon: Icon }) => (
-                  <details className={styles.attentionDisclosure} key={title}>
-                    <summary className={styles.attentionItem}>
-                      <span
-                        className={`${styles.attentionIcon} ${styles[tone]}`}
-                      >
-                        <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
-                      </span>
-                      <span className={styles.attentionCopy}>
-                        <span className={styles.attentionType}>{type}</span>
-                        <strong>{title}</strong>
-                        <span className={styles.attentionDetail}>{detail}</span>
-                      </span>
-                      <ChevronDown
-                        aria-hidden="true"
-                        className={styles.attentionArrow}
-                        size={15}
-                      />
-                    </summary>
-                    <p className={styles.attentionExpanded}>
-                      Sample reminder only. This item will open its management
-                      screen when that feature is built.
-                    </p>
-                  </details>
-                ),
-              )}
-            </div>
-            <div className={styles.attentionFooter}>
-              <span>There’s a lot to coordinate. You’re doing well.</span>
-              <span aria-hidden="true">♡</span>
-            </div>
-          </section>
-
-          <section
-            aria-labelledby="activity-title"
-            className={styles.activityCard}
-            id="activity"
-          >
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.cardEyebrow}>THE LATEST</span>
-                <h2 id="activity-title">Recent activity</h2>
-              </div>
-            </div>
-            <div className={styles.activityList}>
-              {activityItems.map(({ initials, name, action, time, tone }) => (
-                <article
-                  className={styles.activityItem}
-                  key={`${name}-${time}`}
-                >
-                  <span className={`${styles.activityAvatar} ${styles[tone]}`}>
-                    {initials}
-                  </span>
-                  <span className={styles.activityCopy}>
-                    <span>
-                      <strong>{name}</strong> {action}
+        ) : (
+          <>
+            {cleanQuery ? (
+              <section className={styles.searchResults}>
+                <div className={styles.searchResultsHeader}>
+                  <div>
+                    <span className={styles.cardEyebrow}>
+                      CURRENT DASHBOARD ITEMS
                     </span>
-                    <time>{time}</time>
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className={styles.activityIndicator}
-                  />
-                </article>
-              ))}
-            </div>
-            <details className={styles.activityExpansion}>
-              <summary className={styles.textAction}>
-                Show 2 more updates <ChevronDown aria-hidden="true" size={14} />
-              </summary>
-              <div className={styles.activityList}>
-                {additionalActivityItems.map(
-                  ({ initials, name, action, time, tone }) => (
-                    <article
-                      className={styles.activityItem}
-                      key={`${name}-${time}`}
-                    >
-                      <span
-                        className={`${styles.activityAvatar} ${styles[tone]}`}
-                      >
-                        {initials}
-                      </span>
-                      <span className={styles.activityCopy}>
+                    <h2>Results for “{cleanQuery}”</h2>
+                  </div>
+                  <Link href="/dashboard">Clear search</Link>
+                </div>
+                {matches.length ? (
+                  <div className={styles.searchResultsList}>
+                    {matches.map((item, i) => (
+                      <Link key={`${item.href}-${i}`} href={item.href}>
                         <span>
-                          <strong>{name}</strong> {action}
+                          <strong>{item.label}</strong>
+                          <small>{item.detail}</small>
                         </span>
-                        <time>{time}</time>
-                      </span>
+                        <ArrowRight size={16} aria-hidden="true" />
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <p className={styles.noSearchResults}>
+                    No items in this dashboard snapshot match. Open the relevant
+                    module to search all its records.
+                  </p>
+                )}
+              </section>
+            ) : null}
+            {summary.length ? (
+              <section
+                className={styles.summaryGrid}
+                aria-label="Planning summary"
+              >
+                {summary.map(
+                  ({ label, value, detail, icon: Icon, tone, href }) => (
+                    <article className={styles.summaryCard} key={label}>
+                      <div className={styles.summaryTop}>
+                        <span
+                          className={`${styles.summaryIcon} ${styles[tone]}`}
+                        >
+                          <Icon size={18} aria-hidden="true" />
+                        </span>
+                      </div>
+                      <p className={styles.summaryLabel}>{label}</p>
+                      <div className={styles.summaryValue}>{value}</div>
+                      <p className={styles.summaryDetail}>{detail}</p>
+                      <Link className={styles.liveAction} href={href}>
+                        Open {href.slice(1)}
+                        <ArrowRight size={14} aria-hidden="true" />
+                      </Link>
                     </article>
                   ),
                 )}
-              </div>
-            </details>
-          </section>
-
-          <section aria-labelledby="moment-title" className={styles.momentCard}>
-            <div className={styles.momentTopline}>
-              <Sparkles aria-hidden="true" size={15} />A MOMENT TO PAUSE
+              </section>
+            ) : (
+              <p className={styles.liveEmpty}>
+                Your role has no planning summaries available. Ask your wedding
+                administrator if you need access to another module.
+              </p>
+            )}
+            <div className={styles.contentGrid}>
+              {data.events !== null ? (
+                <section className={styles.upcomingCard}>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <span className={styles.cardEyebrow}>ON THE HORIZON</span>
+                      <h2>Upcoming events</h2>
+                    </div>
+                    <Link className={styles.liveAction} href="/events">
+                      View events
+                    </Link>
+                  </div>
+                  <p className={styles.liveMuted}>
+                    Next published events · {wedding.timezone}
+                  </p>
+                  {data.events.length ? (
+                    <ul className={styles.liveList}>
+                      {data.events.map((event) => (
+                        <li key={event.id}>
+                          <Link href={`/events/${event.id}`}>
+                            <strong>{event.name}</strong>
+                            <span>{when(event.startAt)}</span>
+                            <small>
+                              {event.venue || "Venue not specified"}
+                            </small>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.liveEmpty}>
+                      No upcoming published events. Your full schedule,
+                      including drafts, is available in Events.
+                    </p>
+                  )}
+                </section>
+              ) : null}
+              <section className={styles.attentionCard}>
+                <div className={styles.sectionHeader}>
+                  <div>
+                    <span className={styles.cardEyebrow}>
+                      KEEP THINGS MOVING
+                    </span>
+                    <h2>Needs attention</h2>
+                  </div>
+                </div>
+                {attention.length ? (
+                  <ul className={styles.liveList}>
+                    {attention.map((item) => (
+                      <li key={item.label}>
+                        <Link href={item.href}>
+                          <strong>{item.label}</strong>
+                          <small>{item.detail}</small>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={styles.liveEmpty}>
+                    No overdue tasks, unpaid deadlines or pending responses in
+                    the areas you can view.
+                  </p>
+                )}
+              </section>
+              {data.tasks ? (
+                <section className={styles.activityCard}>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <span className={styles.cardEyebrow}>
+                        {data.tasks.assignedOnly
+                          ? "ASSIGNED TO YOU"
+                          : "PLANNING TOGETHER"}
+                      </span>
+                      <h2>Recent tasks</h2>
+                    </div>
+                    <Link className={styles.liveAction} href="/tasks">
+                      View tasks
+                    </Link>
+                  </div>
+                  {data.tasks.recent.length ? (
+                    <ul className={styles.liveList}>
+                      {data.tasks.recent.map((task) => (
+                        <li key={task.id}>
+                          <Link href={`/tasks/${task.id}`}>
+                            <strong>{task.title}</strong>
+                            <small>
+                              {statusLabels[task.status]}
+                              {task.dueAt
+                                ? ` · Due ${when(task.dueAt)}`
+                                : " · No deadline"}
+                            </small>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.liveEmpty}>
+                      {data.tasks.assignedOnly
+                        ? "No tasks assigned to you yet."
+                        : "No tasks yet. Start planning in Tasks."}
+                    </p>
+                  )}
+                </section>
+              ) : null}
+              {data.expenses ? (
+                <section className={styles.activityCard}>
+                  <div className={styles.sectionHeader}>
+                    <div>
+                      <span className={styles.cardEyebrow}>
+                        YOUR RECORDED SPENDING
+                      </span>
+                      <h2>Expense overview</h2>
+                    </div>
+                    <Link className={styles.liveAction} href="/expenses">
+                      View expenses
+                    </Link>
+                  </div>
+                  <dl className={styles.liveMoney}>
+                    <dt>Estimated</dt>
+                    <dd>{formatMoney(data.expenses.estimated)}</dd>
+                    <dt>Committed · unpaid</dt>
+                    <dd>{formatMoney(data.expenses.committed)}</dd>
+                    <dt>Paid</dt>
+                    <dd>{formatMoney(data.expenses.paid)}</dd>
+                  </dl>
+                  <p className={styles.liveMuted}>
+                    Active expenses only. Budget not set. Recording a payment
+                    never transfers money.
+                  </p>
+                </section>
+              ) : null}
             </div>
-            <h2 id="moment-title">One thing at a time.</h2>
-            <p>Every thoughtful detail is bringing your celebration closer.</p>
-            <div className={styles.momentFooter}>
-              <span>Today’s planning note</span>
-              <span className={styles.previewOnly}>A gentle reminder</span>
-            </div>
-          </section>
-        </div>
-
-        <p className={styles.sampleNotice} id="preview-note">
-          <span aria-hidden="true">i</span>
-          All names, dates, counts and activity shown here are sample content
-          for the UI preview.
-        </p>
+            <p className={styles.sampleNotice}>
+              Only data allowed by your current wedding role appears here.
+              Snapshot updated {when(data.generatedAt)}. Reload to refresh.
+            </p>
+          </>
+        )}
       </div>
     </WorkspaceShell>
   );

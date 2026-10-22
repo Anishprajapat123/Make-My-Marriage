@@ -4,6 +4,94 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Review fixes (22 October 2026): expense edit vendor/event/member-payer selections
+are controlled so asynchronous choice loading cannot clear existing links. Mobile
+expense cards now apply the single-column override to subsequent sibling rows too.
+User approved committing this milestone and deploying to the existing Vercel demo.
+Dashboard manual verification was reported by the user; independent role/browser
+acceptance remains separate.
+
+Dashboard real-data integration (22 October 2026): replaced sample counts, event,
+attention items, activity and search fixtures with a permission-scoped snapshot.
+Added GET /api/v1/dashboard and shared server service; the page calls the same
+service directly. Summary cards cover scoped task progress, active guests, RSVP
+responses, exact INR expense totals and active vendors. Upcoming published events
+and recent accessible tasks are bounded previews, with genuine empty/error/retry
+states. Assigned-only task counts reuse existing task rules; vendor-role accounts
+receive no vendor count; missing permissions return null sections without queries.
+Cross-module activity, issue counts and unimplemented budget features are deferred.
+Search covers only visible snapshot items, not global records. No new dependencies,
+paid services, database writes, tests, commit/push or deployment in this step.
+Authenticated browser/role acceptance remains pending.
+Lint, TypeScript, formatting and production build pass for the integration.
+
+Vendors acceptance: user reports manual verification completed. This is user
+acceptance, not an automated browser/security test result. Feature-specific tests
+and independent cross-tenant verification remain pending.
+
+Vendors first slice (22 October 2026): inspected the generated Stitch desktop and
+mobile previews and desktop HTML. Implemented responsive /vendors directory,
+search/category/event/status filters, pagination, add/edit/details, archive/restore,
+optimistic revisions, idempotent creation and transactional activity. Tenant-scoped
+access requires VIEW_VENDORS and MANAGE_VENDORS for writes; VENDOR-role accounts
+are explicitly denied with current-role revalidation on writes. Optional expense
+vendor links validate active same-tenant suppliers and preserve archived links;
+Paid entries remain protected. Financial totals derive from active linked expenses
+and are omitted without VIEW_EXPENSES. Updated API/database contracts. Lint,
+TypeScript and production build pass; the build required network access for the
+existing Google Fonts. No new dependencies, paid service, role migrations, live
+records, commit/push or deployment. Browser/live acceptance and feature-specific
+tests remain pending; earlier Expenses QA predates these linking changes.
+
+Vendors preparation (22 October 2026): reviewed the four documents and Stitch's
+31-screen inventory; no Vendors screen exists. Added VENDORS_STITCH_PROMPT.md for
+responsive directory/forms/details and expense linking. Flagged category/type
+contract mismatch, duplicated payment totals, archive/reference semantics and
+unscoped VENDOR-role directory access. User approved canonical category,
+archive/restore preserving links, linked-expense-only financial totals gated by
+VIEW_EXPENSES, and deferred vendor-account directory access. No vendor
+application code, role migration, dependency or deployment added.
+
+Expenses verification (22 October 2026): 100 automated checks across 11 files
+pass, including 27 new expense boundary/security checks. The deployed live
+Playwright journey passes for custom categories, exact totals, edit/stale/error
+recovery, full-payment retries and Paid protection, unpaid archive/restore,
+pagination, read-only/denied/suspended roles and cross-tenant rejection. Captured
+24 desktop/tablet/mobile screenshots with overflow assertions; inspected ledger
+and form screenshots. Temporary QA records were cleaned with zero remaining QA
+users/weddings/expenses confirmed. No email, money transfer, paid service or
+production-code change was needed. See EXPENSES_QA_REVIEW.md. Google collaborator
+acceptance remains separate; no commit, push or deployment in this check.
+
+Expense review/custom-category follow-up (21 October 2026): category is now a
+bounded text field with built-in datalist suggestions. Custom labels are stored
+only on expenses, retain display casing, and are not added to the suggestion list.
+API/model/types and exact case-insensitive category filtering accept these values.
+Reviewed uncommitted service/repository, permission/transaction, money, retry,
+UI and route changes; fixed final-page pagination after archiving and whitespace
+category searches. Validation/deployment follows; no financial fixtures were
+inserted and no payment was processed.
+
+Deployment follow-up: lint, TypeScript, formatting and Vercel production build
+pass. Deployment dpl_XSsQsUFRkctwBGh1paZ8ahzhzgsu is READY on the existing public
+URL. Hosted login returns 200; anonymous /expenses redirects 307; expense list,
+summary and options APIs return 401. No further actionable code-review findings
+remain from this pass. Signed-in create/custom-category/payment acceptance has not
+been exercised in this deployment. No commit or push was requested/performed.
+
+Expenses first slice (21 October 2026): user delegated the proposed simple policy.
+Implemented responsive /expenses ledger/cards, search/category/event/state/archive
+filters, sorting/pagination, real wedding-wide exact-money totals, expense forms,
+details, manual full-payment confirmation, archive/restore and access/error/stale
+states. Uses tenant-scoped services/repository, Decimal128, exact bigint paise,
+revision checks, idempotent create/payment IDs and transactional audit activity.
+Paid entries are protected; no budget editing/partial payments/uploads/vendors/
+payment gateways were introduced. Inspected the actual generated Stitch desktop
+and mobile screenshots/HTML; preserved their visual direction while removing
+sample stats, simulation controls and deferred-budget actions. No dependencies or
+paid resources added. Lint, TypeScript, formatting and production build pass. No new
+tests were requested or added; live expense acceptance remains pending.
+
 Next-slice preparation (21 October 2026): user confirms live Google login reached
 onboarding/dashboard (user acceptance, not an automated callback test). Atlas is
 user-confirmed Free/M0. Google collaborator acceptance is still a separate pending

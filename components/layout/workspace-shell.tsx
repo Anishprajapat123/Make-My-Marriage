@@ -64,6 +64,8 @@ function NavigationItems({
             label === "Tasks" ||
             label === "Guests" ||
             label === "Invitations" ||
+            label === "Expenses" ||
+            label === "Vendors" ||
             label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
@@ -79,7 +81,11 @@ function NavigationItems({
                           ? "/invitations"
                           : label === "Members"
                             ? "/members"
-                            : "/dashboard"
+                            : label === "Expenses"
+                              ? "/expenses"
+                              : label === "Vendors"
+                                ? "/vendors"
+                                : "/dashboard"
                 }
                 key={label}
               >
@@ -235,11 +241,11 @@ export function WorkspaceShell({
                 className={styles.searchBox}
                 role="search"
               >
-                <button aria-label="Search sample dashboard" type="submit">
+                <button aria-label="Search dashboard" type="submit">
                   <Search aria-hidden="true" size={16} />
                 </button>
                 <input
-                  aria-label="Search sample dashboard content"
+                  aria-label="Search current dashboard items"
                   defaultValue={searchQuery}
                   name="q"
                   placeholder="Search this dashboard"

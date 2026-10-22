@@ -1,5 +1,17 @@
 # Expenses and Budget — Stitch refinement prompt
 
+## Implementation follow-up — 21 October 2026
+
+Submitted this prompt directly to Stitch. Retrieved and inspected actual desktop
+screen 850e5e8072ce4304b222d6bf4789df71 and mobile screen
+595b9a3955214e4a9b75f150b0156e35 screenshots and HTML. User approved INR,
+one full payment, no partial/correction/refund flow, unset budget and protected
+paid entries with unpaid archive/restore. First implementation adapts the ledger
+and cards into the existing shell, excludes preview controls/fake data/budget CTAs,
+and documents its canonical contracts in the API/database designs. The decisions
+below record the earlier preparation and are superseded by those approved
+first-slice contracts where applicable. Live user acceptance remains pending.
+
 ## Preparation
 
 Reviewed PRD section 14, System Design expense flow/permissions, Database Design

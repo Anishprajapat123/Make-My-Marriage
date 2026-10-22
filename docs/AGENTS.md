@@ -24,6 +24,32 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
+- Dashboard first slice: real, permission-scoped server summaries shared by the
+  page and GET /api/v1/dashboard. Keep assignment-only task scope, independent
+  guest/RSVP permissions, VIEW_EXPENSES financial gating and VENDOR directory
+  exclusion. Return null for unauthorized sections and skip their queries. Keep
+  previews bounded; snapshot search is not global search. Cross-module activity
+  requires a separate permission-filtering contract before implementation.
+
+- Approved Vendors defaults (22 October 2026): canonical `category`, archive/restore
+  retaining expense links, and financial totals derived only from linked expenses
+  with VIEW_EXPENSES required. Defer vendor-account directory access until a
+  vendor-specific access contract exists; VENDOR's existing VIEW_VENDORS grant
+  alone does not authorize the full directory. Do not duplicate payment balances.
+
+- Approved Expenses first slice: INR, exact Decimal128 and decimal string
+  contracts, Estimated/Committed creation and one embedded full-payment record
+  that derives Paid. Archive/restore unpaid entries; protect paid entries from
+  edits/archive. No partial payments, corrections/refunds or budget editing yet.
+  Require VIEW_EXPENSES plus MANAGE_EXPENSES/MANAGE_PAYMENTS for their mutations,
+  revisions, idempotent creation/payment retries and tenant-scoped references.
+  Recording payment documents money already paid externally; it never transfers
+  money. Financial records are never exposed to guests or unauthorized members.
+- Expense categories allow required free text (maximum 80 characters) alongside
+  built-in suggestions. Custom values belong only to the expense, not a global
+  or tenant category list. Preserve display casing for custom labels and support
+  escaped exact case-insensitive filtering. Normalize built-in labels consistently.
+
 - Selected self-service demo path: direct Google OAuth via existing Auth.js,
   basic identity scopes, no paid identity platform or silent local-account linking.
   Preserve existing local verified users. Unconfigured email signup/reset returns

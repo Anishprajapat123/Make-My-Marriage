@@ -35,6 +35,30 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
+- Dashboard summaries use real server-resolved data and module permissions.
+  Reuse assignment-scoped task access; do not expose vendor-directory counts to
+  VENDOR accounts or financial totals without VIEW_EXPENSES. Missing permissions
+  produce null sections, not fabricated zero metrics. Do not restore sample
+  activity or unscoped cross-module feeds. Dashboard search covers its snapshot.
+
+- Approved Vendors first-slice defaults: use `category` as the canonical field;
+  archive/restore preserves linked expenses. Derive financial totals only from
+  linked expenses and expose them only with VIEW_EXPENSES. Vendor-account
+  directory access is deferred until vendor-specific access is designed; the
+  existing VENDOR role's VIEW_VENDORS grant alone must not expose the directory.
+
+- Approved Expenses first slice: INR only, exact Decimal128 storage and decimal
+  string API values. Expenses start Estimated/Committed; one full manual payment
+  atomically makes them Paid. No partial payments, refunds or payment corrections.
+  Paid entries cannot be edited or archived; unpaid entries support archive/restore
+  with retained history. Budget editing is deferred and UI shows Budget not set.
+  VIEW_EXPENSES is required for reads and alongside the relevant write permission;
+  payment recording additionally requires MANAGE_PAYMENTS. Never process money.
+- Expense category is required free text (up to 80 characters) with optional
+  built-in suggestions. Preserve custom labels on each expense; never create a
+  permanent custom-category catalog or add them to suggestion lists. Normalize
+  whitespace and built-in spellings; category filtering supports custom labels.
+
 - Google OAuth through Auth.js is the chosen first self-service signup option
   for the zero-budget demo. Use basic identity scopes only; no billable identity
   service or automatic provider linking. Keep local verified-password accounts

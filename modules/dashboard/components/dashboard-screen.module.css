@@ -4,6 +4,75 @@
   padding: 36px 0 0;
 }
 
+.liveList {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+.liveList li + li {
+  border-top: 1px solid #eee7e9;
+}
+.liveList a {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 44px;
+  padding: 16px 0;
+  color: #352b33;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.liveList a:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.liveList span,
+.liveList small,
+.liveMuted {
+  font-size: 12px;
+  color: #766b71;
+  line-height: 1.7;
+}
+.liveEmpty {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #70636c;
+  padding: 18px 0;
+  overflow-wrap: anywhere;
+}
+.liveAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  color: #6b2d5c;
+  font-size: 12px;
+  text-underline-offset: 4px;
+}
+.liveMoney {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  font-size: 13px;
+}
+.liveMoney dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.liveAction:focus-visible,
+.liveList a:focus-visible {
+  outline: 3px solid #a96b97;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.summaryValue {
+  overflow-wrap: anywhere;
+}
+.summaryDetail {
+  min-height: 36px;
+}
+
 .welcome {
   display: flex;
   align-items: flex-end;
@@ -417,14 +486,13 @@
 }
 
 .summaryValue {
-  overflow: hidden;
+  overflow-wrap: anywhere;
   color: #28231f;
   font-family: var(--font-newsreader), Georgia, serif;
   font-size: 27px;
   letter-spacing: -0.035em;
   line-height: 1.1;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .summaryCard:last-child .summaryValue {
