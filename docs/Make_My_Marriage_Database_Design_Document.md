@@ -1128,6 +1128,17 @@ V1 assumes one primary livestream configuration per event.
 
 Wedding problem/issue tracking.
 
+Implemented first slice (22 October 2026): title max180, description max4000,
+revision (default 0), private requestId/requestHash for retry-safe creation and
+unique tenantId/requestId index. An additional tenantId/reportedByMemberId/createdAt
+index supports own-report reads. Reporter is server-derived and immutable; status
+transitions update resolvedAt and revision while appending activity. No deletion.
+Comment documents have private requestId/requestHash and a unique index on tenantId,
+issueId, authorMemberId, requestId. Comments are plain text, max2000, newest-first
+paginated and not editable/deletable in this slice. Both collections are initialized
+before mutation transactions; ownership/access, references and audit appends share
+the transaction. UI history reuses tenant/resource-scoped activity_logs.
+
 ## Fields
 
 | Field | Type | Required |

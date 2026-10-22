@@ -185,6 +185,17 @@ opt-in and separate approval to send its single test email to the fixed test
 recipient. Keep it disabled during ordinary reruns. Test credentials are random,
 remain in memory, and generated records are cleaned in `finally`.
 
+## Issues & problem reporting
+
+Open `/issues`. REPORT_ISSUES permits reporting and commenting on your own reports.
+VIEW_ISSUES grants wedding-wide reading for non-vendor collaborators; management
+also needs MANAGE_ISSUES. Vendor-role accounts stay limited to their own reports.
+Planner edits can assign an active member with wedding-wide issue access. Resolve
+and reopen retain comments and the separate immutable action history. Both are
+paginated; no delete, attachment or automatic notification/email flow is included.
+Event/vendor pickers appear only with lookup permission. There are no new packages
+or paid services. Live browser/role/tenant verification remains pending.
+
 ## In-app notifications
 
 Open `/notifications` or the workspace bell. New task assignments from other

@@ -6,6 +6,17 @@ Reviewed PRD section 22, system design module/access boundaries, database issues
 and issue_comments collections, and API section 27. Stitch inventory has 35
 screens with no named Issues screen. No Issues application code is implemented.
 
+## Implementation follow-up — 22 October 2026
+
+Inspected desktop `df29fb69e22a46e397b1899f447fbdf5` and mobile
+`4e81922cf22c4da9aa1fc2d7caac1d6a` screenshots. Implemented the list/card, details
+and discussion direction in the existing shell, removing sample imagery,
+attachment-style controls, invented metrics and preview controls. The first slice
+includes report/edit, planner assignment, explicit resolve/reopen/status actions,
+scoped counts/filters, paginated comments and a separate immutable action history.
+Reporter-only members have no edit/status controls; vendor roles remain own-scoped.
+Browser/live acceptance remains pending; see BUILD_TRACKER.md for build checks.
+
 ## Paste into the existing Make My Marriage Platform project
 
 ```text

@@ -1774,6 +1774,48 @@ Only public livestream fields should be returned.
 
 # 27. Issue Reporting APIs
 
+### Implemented first slice — 22 October 2026
+
+The following supersedes conflicting earlier examples. Server-resolved active
+membership is required. VIEW_ISSUES grants broad non-vendor reads; REPORT_ISSUES
+without broad access permits only own reports. VENDOR-role accounts remain
+own-scoped even with VIEW_ISSUES and need REPORT_ISSUES to access that scope.
+Planner edits/status changes require VIEW_ISSUES + MANAGE_ISSUES and no vendor role.
+Comments require REPORT_ISSUES or planner management; read-only viewers may read
+but not post. Scope applies before returning comments or resource activity too.
+
+- GET /issues: search title (escaped literal), status, priority, eventId,
+  assignedToMemberId, page (1–10000), limit (1–50, default 25); newest first.
+  Returns `{issues,total,page,limit,counts:{open,inProgress,resolved}}`. Counts cover
+  the permitted scope independently of filters; they never expose wedding totals
+  to reporter-only users.
+- POST /issues: `{requestId:<UUID>,issue:{title,description,priority,eventId,vendorId}}`.
+  Title 1–180, description 1–4000, priority LOW/MEDIUM/HIGH/URGENT (default MEDIUM),
+  nullable event/vendor IDs default null. Reporter comes from the session; status
+  starts OPEN. Same key/payload/reporter retries return the original ID.
+- GET /issues/:issueId returns the explicit permitted record with minimal labels;
+  event/vendor names are omitted without those modules' lookup permissions.
+- PATCH /issues/:issueId: `{revision,issue:<report fields plus assignedToMemberId>}`.
+  Full edit replaces editable fields; status is not writable through this route.
+- PATCH /issues/:issueId/status: `{revision,status:OPEN|IN_PROGRESS|RESOLVED}`.
+  Resolve sets resolvedAt; reopening clears it and retains comments/history.
+- GET /issues/options: bounded permitted event/vendor choices; eligible member
+  choices only for managers (up to 500 each). New assignees must be active,
+  non-vendor and have VIEW_ISSUES. Retained previous assignments stay attributed.
+- GET /issues/:issueId/comments?page=N returns 25 comments, newest first, plus
+  page/hasNext. POST accepts `{requestId:<UUID>,body}` (1–2000 plain-text characters),
+  idempotent per issue/author/key; altered retry payload returns 409.
+- GET /issues/:issueId/activity?page=N returns paginated immutable action summaries
+  only after the corresponding issue-scope check. No activity-write endpoint exists.
+
+All tenant-owned operations include tenantId; own-report scope also includes
+reportedByMemberId. Mutations revalidate current roles/status transactionally.
+New references require the relevant lookup permission; vendor links must be active
+unless retaining an existing archived reference. No contact/notes directories are
+exposed through choices. No deletion, attachments, automated tasks, emails or new
+notification triggers are implemented. Responses are no-store; invalid data is 400,
+forbidden actions 403, inaccessible/missing IDs 404 and stale revisions 409.
+
 ## 27.1 Create issue
 
 ```http

@@ -71,6 +71,7 @@ function NavigationItems({
             label === "Expenses" ||
             label === "Vendors" ||
             label === "Notifications" ||
+            label === "Issues" ||
             label === "Members" ? (
               <Link
                 aria-current={label === activePage ? "page" : undefined}
@@ -92,7 +93,9 @@ function NavigationItems({
                                 ? "/vendors"
                                 : label === "Notifications"
                                   ? "/notifications"
-                                  : "/dashboard"
+                                  : label === "Issues"
+                                    ? "/issues"
+                                    : "/dashboard"
                 }
                 key={label}
               >

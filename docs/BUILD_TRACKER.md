@@ -4,6 +4,22 @@ This tracker records what is built and what remains for the Make My Marriage V1.
 
 ## Recent work
 
+Issues first slice (22 October 2026): inspected Stitch desktop/mobile previews and
+implemented /issues with responsive list/cards, scoped counts/search/filters,
+report/edit/details, planner assignment, resolve/reopen/progress confirmations,
+paginated plain-text comments and separate immutable action history. Own-report
+scope is applied to list/counts/details/comments/history; VENDOR grants cannot
+expand that scope. Mutations recheck active membership/current roles in the
+transaction, use revisions and retry-safe create/comment keys, and append activity.
+New assignees must have active non-vendor wedding-wide issue access. New event/vendor
+links require lookup permission and same-tenant transactional validation; archived
+vendor references can be retained. No deletion, attachments, emails, notification
+triggers, dependencies or paid services. No database fixtures, tests, commit/push
+or deployment in this step. Live browser/role/tenant acceptance remains pending.
+Lint, TypeScript, formatting and production build pass after fixing the comments
+model typing and loading-state lint issues. No tests were added/run in this step;
+older module QA does not establish Issues acceptance.
+
 Notifications deployed (22 October 2026): application commit 87131a4 on local dev;
 Vercel deployment dpl_FVPGT2c1Vf7nk6BEp8dh6jHpjzEh READY at the existing public
 domain https://make-my-marriage-sepia.vercel.app. Hosted /login returns 200,
