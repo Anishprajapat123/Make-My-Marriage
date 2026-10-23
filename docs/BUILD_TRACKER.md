@@ -3,6 +3,18 @@
 This tracker records what is built and what remains for the Make My Marriage V1. It follows the [PRD](<Make My Marriage — Product Requirements Document (PRD).md>), [System Design](Make_My_Marriage_System_Design_Document.md), [Database Design](Make_My_Marriage_Database_Design_Document.md), and [API Design](Make_My_Marriage_API_Design_Document.md). Those documents remain the source of truth if this checklist is incomplete or out of date.
 
 ## Recent work
+Next.js security patch (23 October 2026): isolated branch security/next-16.4.2
+upgrades Next.js and eslint-config-next from 16.4.0 to exact 16.4.2 and enables
+experimental.agentUpgrade=security while retaining standalone output. npm install,
+exact-version check, lint, type checking, formatting, production build and 100/100
+unit tests pass. Existing test fixtures were repaired to isolate notification bell
+fetches and stub task notification preparation/previous-assignment lookup; original
+behavioral assertions remain. Anonymous production smoke checks: home/login/CSS 200,
+dashboard 307 to login, Events/Notifications APIs 401. No live database/email action.
+Production dependency audit: zero vulnerabilities; full audit retains five high
+findings in the development ESLint/glob dependency chain. No force downgrade or
+unrelated dependency upgrade. Original checkout and pending UI work stay separate;
+this branch is not merged or deployed. No PR publication without permission.
 
 Issues first slice (22 October 2026): inspected Stitch desktop/mobile previews and
 implemented /issues with responsive list/cards, scoped counts/search/filters,

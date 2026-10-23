@@ -1,3 +1,7 @@
+vi.mock("@/modules/notifications/notification.repository", () => ({
+  prepareNotifications: vi.fn(),
+  notifyTaskAssignments: vi.fn(),
+}));
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import mongoose, { Types } from "mongoose";
 const mocks = vi.hoisted(() => ({
@@ -6,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   append: vi.fn(),
   create: vi.fn(),
+  previous: vi.fn(),
 }));
 vi.mock("@/auth", () => ({ auth: vi.fn() }));
 vi.mock("@/modules/wedding/wedding.service", () => ({
@@ -18,7 +23,11 @@ vi.mock("@/modules/members/member.model", () => ({
   MemberModel: { countDocuments: mocks.members },
 }));
 vi.mock("@/modules/tasks/task.model", () => ({
-  TaskModel: { findOneAndUpdate: mocks.update, create: mocks.create },
+  TaskModel: {
+    findOneAndUpdate: mocks.update,
+    create: mocks.create,
+    findOne: mocks.previous,
+  },
   TaskCommentModel: {},
 }));
 vi.mock("@/modules/activity/activity.repository", () => ({
@@ -40,6 +49,13 @@ beforeEach(() => {
   session.withTransaction.mockImplementation(async (fn) => fn());
   vi.spyOn(mongoose, "startSession").mockResolvedValue(session as never);
   mocks.event.mockResolvedValue({ matchedCount: 1 });
+  mocks.previous.mockReturnValue({
+    select: () => ({
+      session: () => ({
+        lean: () => Promise.resolve({ assigneeMemberIds: [] }),
+      }),
+    }),
+  });
   mocks.update.mockReturnValue({
     lean: () => Promise.resolve({ _id: scope._id }),
   });

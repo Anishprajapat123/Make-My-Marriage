@@ -1,3 +1,6 @@
+vi.mock("@/modules/notifications/components/notification-bell", () => ({
+  NotificationBell: () => null,
+}));
 import { afterEach, expect, it, vi } from "vitest";
 import {
   cleanup,
