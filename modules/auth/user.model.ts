@@ -34,6 +34,7 @@ const userSchema = new Schema(
       trim: true,
       maxlength: 120,
     },
+    profileRevision: { type: Number, default: 0 },
     avatarUrl: {
       type: String,
       default: null,

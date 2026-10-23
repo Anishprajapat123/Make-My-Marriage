@@ -24,6 +24,14 @@ This file is the project-specific development guide. The four design documents i
 
 ## Product boundaries
 
+- Completion workflow update (22 October 2026): user requested coordinated batches
+  of remaining features, including photo uploads. Cloudinary Free is explicitly
+  approved as the demo photo-storage exception to S3. Preserve MongoDB metadata,
+  tenant ownership, authorized uploads, verified completion and original/optimized/
+  thumbnail variants. No paid add-ons, trials or automatic upgrades; handle quota
+  unavailability truthfully. Provider account setup is required before live uploads.
+  Keep milestones reviewable and distinguish implementation from verification.
+
 - Approved Issues slice: planners manage with VIEW_ISSUES + MANAGE_ISSUES;
   REPORT_ISSUES-only members may report, read and comment on their own reports.
   Apply scope to counts/comments/reference lookups too. Vendor-role accounts have
@@ -84,6 +92,13 @@ This file is the project-specific development guide. The four design documents i
 - Excluded from V1: accommodation, transportation, seating planner, guest check-in, face recognition, automatic post-wedding deletion, and SaaS billing.
 
 ## Implementation practices
+
+- Implemented demo publication requires publicPagePublishedAt plus enabled page,
+  with separately gated public gallery/livestream and published-event scope.
+  Cloudinary URLs are shareable; do not describe them as authenticated private
+  storage. Bounded server uploads retain fixed verified variants; explicit manager
+  deletion and recovery retain lifecycle metadata. Profile updates only change
+  displayName/phone with revision checks, never verified email/provider identity.
 
 - Keep secrets, database/storage clients, and authorization logic server-side. Use explicit server/client boundaries and validate all external input.
 - Keep domain logic in its owning module and avoid duplicated business rules across pages, Route Handlers, services, and repositories.

@@ -70,6 +70,8 @@ function NavigationItems({
             label === "Invitations" ||
             label === "Expenses" ||
             label === "Vendors" ||
+            label === "Gallery" ||
+            label === "Livestream" ||
             label === "Notifications" ||
             label === "Issues" ||
             label === "Members" ? (
@@ -91,11 +93,15 @@ function NavigationItems({
                               ? "/expenses"
                               : label === "Vendors"
                                 ? "/vendors"
-                                : label === "Notifications"
-                                  ? "/notifications"
-                                  : label === "Issues"
-                                    ? "/issues"
-                                    : "/dashboard"
+                                : label === "Gallery"
+                                  ? "/gallery"
+                                  : label === "Livestream"
+                                    ? "/livestream"
+                                    : label === "Notifications"
+                                      ? "/notifications"
+                                      : label === "Issues"
+                                        ? "/issues"
+                                        : "/dashboard"
                 }
                 key={label}
               >
@@ -172,14 +178,14 @@ function SidebarContents({
 
       <div className={styles.sidebarBottom}>
         <SignOutButton />
-        <span
-          aria-disabled="true"
-          className={`${styles.navigationItem} ${styles.upcomingItem}`}
-          title="Settings screen is planned for a later UI step"
+        <Link
+          href="/settings"
+          aria-current={activePage === "Settings" ? "page" : undefined}
+          className={`${styles.navigationItem} ${activePage === "Settings" ? styles.activeItem : ""}`}
         >
           <Settings2 aria-hidden="true" size={18} strokeWidth={1.8} />
           <span>Settings</span>
-        </span>
+        </Link>
         <div className={styles.memberCard}>
           <span aria-hidden="true" className={styles.memberAvatar}>
             {memberName.slice(0, 1).toUpperCase()}

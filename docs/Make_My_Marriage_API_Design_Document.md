@@ -2968,3 +2968,38 @@ This slice supersedes anonymous attendee-count inputs: companions are named indi
 - Retry the same requestId and body safely; changed body or stale revision returns 409. Possible duplicates return generic COMPANION_REVIEW_REQUIRED with a server-validated confirmation fingerprint, never unrelated guest identities.
 - Removing a companion from attendance records NO; host-managed names are not overwritten. Counts derive individual active guests, not sums of partySize. Archive revokes a guest's link transactionally; restore needs explicit replacement.
 - Public per-token limits: 120 reads/minute and 20 writes/minute, with 429/Retry-After. Configure edge rate limiting before release. All public invitation responses are no-store and no-referrer.
+# Demo batch contract update — 22 October 2026
+
+This section records the Cloudinary Free demo exception approved by the user and
+the first settings/gallery/livestream implementation. Earlier S3 presigned upload
+contracts remain future deployment direction, not implemented demo endpoints.
+
+- GET `/api/v1/wedding`: explicit settings DTO; PATCH requires VIEW_WEDDING plus
+  MANAGE_WEDDING, revision, title, brideName, groomName, city, description, hashtag,
+  published, publicGallery and publicLivestream. Slug/date/timezone stay unchanged.
+- GET/PATCH `/api/v1/auth/profile`: authenticated account only, displayName/phone
+  updates with profile revision. Email/provider changes are unavailable.
+- GET `/api/v1/gallery/albums?album=<id>`: VIEW_GALLERY; bounded albums/photos,
+  minimal event choices for album managers and failed/pending slots for managers.
+  POST accepts name/eventId with VIEW_GALLERY + MANAGE_ALBUMS.
+- POST `/api/v1/gallery/albums/:albumId/photos`: multipart `file`, VIEW_GALLERY +
+  UPLOAD_PHOTOS; server proxies at most 3 MB JPEG/PNG/WebP to signed Cloudinary
+  upload. Reserves one of 20 wedding slots transactionally before external work.
+  Completion is verified server-side; no client-provided object URL is trusted.
+- DELETE `/api/v1/gallery/photos/:photoId`: JSON body `{}`, VIEW_GALLERY +
+  MANAGE_ALBUMS; requests provider destruction then retains terminal metadata.
+  Failed/interrupted removal is retryable. Pending operations have a two-minute
+  recovery guard. Deleted slots are reusable; other states reserve capacity.
+- GET `/api/v1/livestreams`: VIEW_LIVESTREAM; POST creates/updates an event stream
+  with VIEW_LIVESTREAM + MANAGE_LIVESTREAM, eventId/title/url/status/isPublic and
+  revision (null for creation). One per event; HTTPS YouTube video links only.
+  Statuses SCHEDULED/LIVE/ENDED/DISABLED. No arbitrary iframe or video hosting.
+- Public `/wedding/:slug` requires explicit publication marker and enabled page.
+  Public event DTOs contain only published schedule/location/dress-code content.
+  Gallery/livestream additionally require their wedding switches, active albums/
+  READY photos or explicitly public non-disabled streams, and published events.
+  No member directory, guest/contact/private-note or financial data is returned.
+
+Cloudinary image URLs are shareable, not authenticated private media. Unpublishing
+does not revoke previously shared provider URLs. No guest gallery access from an
+RSVP token or album editing/archive contract is claimed in this first slice.

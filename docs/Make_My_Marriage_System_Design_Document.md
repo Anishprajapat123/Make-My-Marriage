@@ -1335,3 +1335,18 @@ Family Member now has VIEW_EVENTS for the full workspace schedule, without event
 Invitation configuration/lifecycle belongs to modules/invitations; response mutations belong to modules/rsvp. Thin versioned handlers delegate to these modules. Shared wedding transactions serialize guest, family, link and response changes while revalidating authenticated access. Public requests derive tenant and party from an active hashed token, not caller-supplied tenant IDs. Named companions become individual guest records; no anonymous headcount or guest accounts are introduced.
 
 Guest links are copied/shared without email delivery in this slice, are explicitly replaceable/revocable, and have no automatic expiry. Archive invalidates access; restore never silently revives a token. Public DTOs omit private contacts/notes and unrelated guest data. MongoDB per-token limits supplement required trusted-edge/WAF limits before deployment. Photo customization, invitation email distribution, and production load certification remain follow-up work.
+# Zero-budget demo implementation exception — 22 October 2026
+
+The user approved Cloudinary Free instead of S3 for demo photos. The server checks
+the provider is Free with conservative available usage before uploads, uses signed
+server-side uploads, and verifies fixed original/optimized/thumbnail references.
+The demo proxies bounded 3 MB files through Next.js rather than presigned S3 direct
+uploads; 20 non-deleted photo slots per wedding bound application usage. No SDK,
+queue, paid add-on or automatic upgrade is introduced. Provider limits can make
+uploads unavailable. Cloudinary delivery URLs are shareable; authenticated private
+media and S3 production deployment remain future work.
+
+Wedding public pages require explicit publication; legacy settings booleans do not
+publish existing weddings. Public projections exclude all private workspace data.
+External YouTube links implement livestream viewing without hosting video. Profile
+editing covers display name/phone, preserving verified identity and provider.

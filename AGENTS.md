@@ -35,6 +35,14 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 
 ## Product scope
 
+- User now permits coordinated completion batches rather than requiring one
+  feature per turn. Keep module boundaries and reviewable validation checkpoints;
+  do not mark the project complete while required functionality or acceptance is
+  outstanding. Cloudinary Free is approved for demo photos instead of S3; retain
+  original/optimized/thumbnail semantics and server-verified upload authorization
+  and completion. No paid plan/add-ons/automatic upgrades. S3 remains the future
+  deployment direction. Never expose CLOUDINARY_API_SECRET to clients.
+
 - Approved Issues first-slice defaults: VIEW_ISSUES + MANAGE_ISSUES for planner
   management; REPORT_ISSUES-only members read/comment on their own reports.
   Vendor-role accounts never gain general issue-directory access from broad role
@@ -93,6 +101,15 @@ The approved product and architecture rules are in [`docs/AGENTS.md`](docs/AGENT
 - Use an external livestream provider initially. Do not build video infrastructure into this application.
 
 ## Change and verification rules
+
+- Demo gallery/settings/livestream rules: existing weddings require an explicit
+  publicPagePublishedAt marker before publication; legacy enabled booleans alone
+  never publish. Public galleries/streams also require published events and their
+  visibility switches. Cloudinary media URLs are shareable, not private signed
+  assets; explain that unpublishing does not revoke existing URLs. Only authorized
+  managers may explicitly remove photos. Keep bounded server uploads (3 MB, 20
+  non-deleted slots/wedding), verified fixed variants and retryable cleanup states.
+  Profile editing cannot change verified email, provider or account linking.
 
 - Before a substantial feature, state the approach and affected modules; keep responsibilities aligned with the design documents.
 - Keep [`docs/BUILD_TRACKER.md`](docs/BUILD_TRACKER.md) current as work is completed. Mark UI previews separately from implemented features, and update the root and `docs/AGENTS.md` instructions when the user approves lasting product, architecture, or workflow decisions.

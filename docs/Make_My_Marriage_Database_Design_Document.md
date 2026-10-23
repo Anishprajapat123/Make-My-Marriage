@@ -2189,3 +2189,19 @@ Invitation content uses one invitations record per tenant with published/revisio
 rsvps has unique tenantId+guestId and individual YES/NO/PENDING response; partySize is informational and never summed for total guest counts. Public companions are guests with source GUEST_RSVP, addedByGuestId, and private rsvpClientId; a partial unique tenantId+addedByGuestId+rsvpClientId index prevents duplicate retry creation. Existing guest/family references remain tenant scoped.
 
 Activity may use actorGuestId with nullable actorMemberId for genuine no-account RSVP attribution. public_rate_limits stores hashed token/scope/minute keys and a short expiresAt TTL, never raw bearer tokens. Wedding guestWriteVersion serializes guest/family/invitation/RSVP transactions; authenticated writes revalidate member permission inside the transaction.
+# Demo batch persistence update — 22 October 2026
+
+Approved Cloudinary Free demo exception: gallery_albums has tenantId/eventId unique,
+name/status/revision. Photos have tenant/album/event/uploader IDs, hidden provider
+publicId, original/optimized/thumbnail URLs and verified bytes/dimensions. Lifecycle:
+UPLOADING → READY or FAILED; explicit removal uses DELETING → DELETED or
+DELETE_FAILED. Retain metadata/history; no automatic post-wedding deletion. Capacity
+counts all non-DELETED rows (20/wedding). Provider deletion occurs outside MongoDB
+transactions; retained states allow explicit retry after interruption.
+
+Wedding settings add revision and nullable publicPagePublishedAt. Public reads must
+require a date marker plus publicWeddingPageEnabled; legacy true booleans do not
+authorize publication. Profile edits use user.profileRevision and never mutate
+email/authProvider/verified status. Livestreams are unique tenantId/eventId, store
+validated YouTube videoId/title/status/isPublic/revision/creator, and derive URLs.
+All linked references are checked with tenant filters in wedding transactions.

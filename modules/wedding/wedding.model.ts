@@ -4,6 +4,8 @@ import { model, models, Schema, type InferSchemaType } from "mongoose";
 const weddingSchema = new Schema(
   {
     slug: { type: String, required: true, unique: true, trim: true },
+    revision: { type: Number, default: 0 },
+    publicPagePublishedAt: { type: Date, default: null },
     status: {
       type: String,
       enum: ["PLANNING", "ACTIVE", "COMPLETED"],

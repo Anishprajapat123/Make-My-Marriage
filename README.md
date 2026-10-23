@@ -244,3 +244,33 @@ Restart an already-running development server once after updating this feature s
 Before deployment, configure trusted-edge/WAF rate limits for public endpoints. The application also applies MongoDB-backed per-token limits, which do not replace protection against random-token traffic.
 
 Invitation QA (temporary development records, no email): build, set `RUN_INVITATIONS_LIVE_QA=1`, then run `npm run test:e2e -- --config playwright.invitations.config.ts`.
+
+# Gallery, settings and livestream demo
+
+- `/settings` edits the wedding's public text and your own display name/phone.
+  Sign-in email/provider changes, date/timezone changes and ownership transfer are
+  outside this slice. Profile header names refresh after signing in again.
+- Existing weddings remain unpublished. A manager must explicitly publish the
+  wedding page; gallery and livestream visibility have additional switches.
+- `/gallery` creates event albums and uploads JPEG, PNG or WebP images through
+  the server. Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and
+  `CLOUDINARY_API_SECRET` privately in `.env.local`; restart the development server
+  after environment/model changes. Add these variables privately to Vercel only
+  when deploying. Never use `NEXT_PUBLIC_` for credentials or enable unsigned uploads.
+- The approved demo uses Cloudinary Free without a payment method or paid add-ons.
+  Uploads require a verified Free account and stop conservatively at 20 used provider
+  credits. Allowances are shared with transformations and bandwidth, not unlimited.
+  Each wedding has 20 upload slots and a 3 MB per-photo limit. Original, optimized
+  and thumbnail references are stored only after server verification. Managers can
+  remove photos and recover failed slots; interrupted uploads become removable
+  after two minutes. Deletion may take time to disappear from external caches.
+- Cloudinary delivery URLs are shareable bearer URLs, not authenticated private
+  media. Do not upload sensitive documents. Unpublishing removes public page access
+  but does not invalidate already shared image URLs; remove the photo to request
+  provider deletion. Private signed media is deferred.
+- `/livestream` links existing HTTPS YouTube watch/live videos. It does not create
+  a broadcast. Public viewing additionally requires a published event, a public
+  stream record and the wedding publication switches. Disable a stream to remove
+  its viewing link. YouTube privacy/availability is controlled at YouTube.
+- No new packages, paid services or automatic upgrades are required. These local
+  features require browser/live acceptance before being called release-ready.

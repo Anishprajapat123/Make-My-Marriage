@@ -3,18 +3,55 @@
 This tracker records what is built and what remains for the Make My Marriage V1. It follows the [PRD](<Make My Marriage — Product Requirements Document (PRD).md>), [System Design](Make_My_Marriage_System_Design_Document.md), [Database Design](Make_My_Marriage_Database_Design_Document.md), and [API Design](Make_My_Marriage_API_Design_Document.md). Those documents remain the source of truth if this checklist is incomplete or out of date.
 
 ## Recent work
-Next.js security patch (23 October 2026): isolated branch security/next-16.4.2
-upgrades Next.js and eslint-config-next from 16.4.0 to exact 16.4.2 and enables
-experimental.agentUpgrade=security while retaining standalone output. npm install,
-exact-version check, lint, type checking, formatting, production build and 100/100
-unit tests pass. Existing test fixtures were repaired to isolate notification bell
-fetches and stub task notification preparation/previous-assignment lookup; original
-behavioral assertions remain. Anonymous production smoke checks: home/login/CSS 200,
-dashboard 307 to login, Events/Notifications APIs 401. No live database/email action.
-Production dependency audit: zero vulnerabilities; full audit retains five high
-findings in the development ESLint/glob dependency chain. No force downgrade or
-unrelated dependency upgrade. Original checkout and pending UI work stay separate;
-this branch is not merged or deployed. No PR publication without permission.
+Security patch integrated on dev (23 October 2026): applied verified commit
+3525522 as 6b6bf79, preserving pending gallery/settings/livestream work. Next.js
+and eslint-config-next are pinned to 16.4.2, with experimental.agentUpgrade set
+to security. The isolated patch passed build, lint, types, formatting, 100 unit
+tests and anonymous production smoke checks; active checkout also passes lint, type checking, production build and 100/100 tests.
+
+Stitch alignment (23 October 2026): inspected all eight actual desktop/mobile
+screens for Settings/Profile, Gallery, External Livestreams and Public Wedding
+Page, and retrieved desktop HTML. Applied their section/card hierarchy, responsive
+grids, typography/palette, album tabs, real capacity/photo metadata, publication
+switches and public-page composition. Settings now separates details/publication
+saves, preserves the other draft, shows unsaved changes and exposes a public link
+only from saved publication state. Stream visibility reflects all server gates.
+Excluded generated prototype controls, fake video metrics/images, unsupported ZIP
+downloads, travel/seating and compliance claims. See
+SETTINGS_GALLERY_LIVESTREAM_STITCH_REVIEW.md for screen IDs and differences.
+Browser/live-upload acceptance remains pending; no commit/push/deployment.
+Alignment validation: lint, type checking and formatting pass. Production build
+compiled/generated pages successfully; the build tool flagged the installed Next.js
+version for a security upgrade. Dependency remediation is separate from this UI
+alignment and should be reviewed before deployment.
+
+Validation for gallery/settings/livestream batch: lint, TypeScript type checking,
+repository formatting check and final production build all pass (22 October 2026).
+No tests or live photo uploads were run. Manual browser acceptance remains pending.
+
+Gallery/settings/livestream batch (22 October 2026): verified configured Cloudinary
+account through its authenticated usage endpoint as Free, 0/25 credits used, without
+printing credentials. Added event albums, bounded server uploads, verified original/
+optimized/thumbnail metadata, authorized photo deletion and failed-slot recovery.
+Added wedding text/publication settings, personal display-name/phone editing with
+revisions, explicit opt-in public wedding page, and external YouTube livestream
+configuration with revisions/publication gates. New responsive screens use the
+existing workspace shell. Existing public booleans alone cannot publish a wedding;
+a new explicit publication marker is required. Cloudinary URLs remain shareable,
+not authenticated private media; this limitation is stated in UI/README.
+No live photo upload, database fixtures, tests, commit, push or deployment performed
+for this batch. Browser/upload/role/tenant acceptance remains pending. Profile name
+in existing JWT headers refreshes after a new sign-in. Album rename/archive, private
+signed delivery and other completion-plan gaps remain deferred.
+
+Completion scope update (22 October 2026): Issues committed locally as 4d395e0.
+User requested coordinated remaining-feature batches, explicitly including photos,
+and approved Cloudinary Free as a demo exception to S3 after reviewing storage.
+Added COMPLETION_PLAN.md and blank Cloudinary environment examples; no credentials
+were read or printed. Remaining settings/public pages/gallery/livestream/roles/
+import-export/search-reports/reminders/acceptance are not marked complete. Cloudinary
+account setup is required before live uploads; no new provider/account/package,
+paid resource or deployment was created by this preparation step.
 
 Issues first slice (22 October 2026): inspected Stitch desktop/mobile previews and
 implemented /issues with responsive list/cards, scoped counts/search/filters,
