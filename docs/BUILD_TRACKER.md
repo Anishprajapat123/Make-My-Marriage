@@ -3,6 +3,16 @@
 This tracker records what is built and what remains for the Make My Marriage V1. It follows the [PRD](<Make My Marriage — Product Requirements Document (PRD).md>), [System Design](Make_My_Marriage_System_Design_Document.md), [Database Design](Make_My_Marriage_Database_Design_Document.md), and [API Design](Make_My_Marriage_API_Design_Document.md). Those documents remain the source of truth if this checklist is incomplete or out of date.
 
 ## Recent work
+Production release (23 October 2026): application commit 41351ca pushed to
+Anishprajapat123/Make-My-Marriage dev, including the Next.js 16.4.2 security patch
+6b6bf79. Vercel production deployment dpl_9UkXuqnWeGLMsvGDFSAVE2mwHqnN is READY
+at https://make-my-marriage-sepia.vercel.app. Cloudinary production variables were
+configured privately; no credentials were committed or printed. Final lint, types,
+formatting and production build pass. Ten anonymous hosted checks pass: home/login
+200; gallery/settings/livestream 307 to login; gallery/wedding/livestream/profile
+APIs 401; invalid public wedding slug 404. Signed-in browser/role/tenant workflows
+and a live photo upload remain separate acceptance work. No production records or
+emails were created by these checks; no paid plan or add-on was enabled.
 Security patch integrated on dev (23 October 2026): applied verified commit
 3525522 as 6b6bf79, preserving pending gallery/settings/livestream work. Next.js
 and eslint-config-next are pinned to 16.4.2, with experimental.agentUpgrade set
